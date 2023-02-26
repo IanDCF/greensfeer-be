@@ -3,23 +3,31 @@ const express = require("express");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 const app = express();
+const admin = require("firebase-admin");
+
+// Require Firebase Admin App
 const {
   initializeApp,
   applicationDefault,
   cert,
 } = require("firebase-admin/app");
+
+// Require Firebase Firestore
 const {
   getFirestore,
   Timestamp,
   FieldValue,
 } = require("firebase-admin/firestore");
 
+// Require secret keys
 const serviceAccount = require("./keys.json");
 
+// Initialize Firebase App
 initializeApp({
   credential: cert(serviceAccount),
 });
 
+// Initialize Firebase Firestore
 const db = getFirestore();
 
 const corsOptions = {
@@ -28,22 +36,49 @@ const corsOptions = {
   credentials: true,
 };
 
+// Middleware
 app.use(cors(corsOptions));
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // Home Route
 app.get("/", (req, res) => {
   return res.status(200).send("Greensfeer Backend");
 });
 
-// Create => POST
+// Firebase Authentication: Register new user
+app.post("/register", (req, res) => {
+  const user = {
+    first_name: req.body.first_name,
+    last_name: req.body.last_name,
+    displayName: `${req.body.first_name} ${req.body.last_name}`,
+    email: req.body.email,
+    password: req.body.password,
+  };
+
+  admin
+    .auth()
+    .createUser(user)
+    .then((userRecord) => {
+      console.log(userRecord);
+      // See the UserRecord reference doc for the contents of userRecord.
+      console.log(`Successfully created new user: ${userRecord.uid}`);
+      return res.status(201).send();
+    })
+    .catch((error) => {
+      console.log("Error creating new user:", error);
+    });
+});
+
+// POST: Create new user doc in 'user' collection
 app.post("/user", (req, res) => {
   const userId = uuidv4();
   db.collection("user")
     .doc(`${userId}`)
     .set({
-      name: req.body.name,
-      position: req.body.position,
-      company: req.body.company,
+      first_name: req.body.first_name,
+      last_name: req.body.last_name,
+      email: req.body.email,
     })
     .then(() => {
       console.log(`User ${userId} successfully created`);
@@ -55,8 +90,7 @@ app.post("/user", (req, res) => {
     });
 });
 
-// Read => GET
-// Single User with ID
+// GET: Read single user information with id parameter
 app.get("/user/:id", (req, res) => {
   db.collection("user")
     .doc(req.params.id)
@@ -74,7 +108,8 @@ app.get("/user/:id", (req, res) => {
       return res.status(500).send({ error: "Server error" });
     });
 });
-// All users
+
+// GET: Read all user profiles
 app.get("/user", async (req, res) => {
   try {
     const snapshot = await db.collection("user").get();
@@ -89,7 +124,7 @@ app.get("/user", async (req, res) => {
   }
 });
 
-// Update => PATCH
+// PATCH: Update single user profile with id parameter
 app.patch("/user/:id", (req, res) => {
   const updateObject = req.body;
   db.collection("user")
@@ -113,8 +148,7 @@ app.patch("/user/:id", (req, res) => {
     });
 });
 
-// Delete
-// Single User with ID
+// DELETE: Delete single user with id parameter
 app.delete("/user/:id", (req, res) => {
   db.collection("user")
     .doc(`${req.params.id}`)
