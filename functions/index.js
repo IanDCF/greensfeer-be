@@ -47,11 +47,11 @@ app.get("/", (req, res) => {
 });
 
 // Firebase Authentication: Register new user
+// Firestore: Create new user document in 'user' collection
 app.post("/register", (req, res) => {
   const user = {
     first_name: req.body.first_name,
     last_name: req.body.last_name,
-    displayName: `${req.body.first_name} ${req.body.last_name}`,
     email: req.body.email,
     password: req.body.password,
   };
@@ -60,17 +60,24 @@ app.post("/register", (req, res) => {
     .auth()
     .createUser(user)
     .then((userRecord) => {
-      console.log(userRecord);
-      // See the UserRecord reference doc for the contents of userRecord.
-      console.log(`Successfully created new user: ${userRecord.uid}`);
-      return res.status(201).send();
+      db.collection("user").doc(`${userRecord.uid}`).set(user);
+      return userRecord;
+    })
+    .then((userRecord) => {
+      return res
+        .status(201)
+        .send({ message: `Successfully created new user: ${userRecord.uid}` });
     })
     .catch((error) => {
       console.log("Error creating new user:", error);
+      return res
+        .status(500)
+        .send({ message: `Error creating new user: ${error}` });
     });
 });
 
 // POST: Create new user doc in 'user' collection
+// Don't need this anymore
 app.post("/user", (req, res) => {
   const userId = uuidv4();
   db.collection("user")
@@ -82,7 +89,7 @@ app.post("/user", (req, res) => {
     })
     .then(() => {
       console.log(`User ${userId} successfully created`);
-      return res.status(200).send();
+      return res.status(201).send();
     })
     .catch((err) => {
       console.log(err);
