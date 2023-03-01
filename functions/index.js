@@ -46,33 +46,83 @@ app.get("/", (req, res) => {
   return res.status(200).send("Greensfeer Backend");
 });
 
+const isEmpty = (str) => {
+  if (str === "") return true;
+};
+
 // Firebase Authentication: Register new user
 // Firestore: Create new user document in 'user' collection
 app.post("/register", (req, res) => {
+  const password = req.body.password;
+  const confirm_password = req.body.confirm_password;
   const user = {
     first_name: req.body.first_name,
     last_name: req.body.last_name,
     email: req.body.email,
-    password: req.body.password,
+    created_at: new Date().toISOString(),
   };
+
+  let errors = {};
+
+  if (isEmpty(user.first_name))
+    errors.first_name = "First Name field must not be empty";
+  if (isEmpty(user.last_name))
+    errors.last_name = "Last Name field must not be empty";
+  if (password !== confirm_password) errors.password = "Passwords must match";
+
+  if (Object.keys(errors).length > 0)
+    return res.status(400).send({ error: errors });
 
   admin
     .auth()
     .createUser(user)
     .then((userRecord) => {
-      db.collection("user").doc(`${userRecord.uid}`).set(user);
-      return userRecord;
+      console.log(userRecord);
+      const uid = userRecord.uid;
+      db.collection("user").doc(`${uid}`).set(user);
+      return uid;
     })
-    .then((userRecord) => {
-      return res
-        .status(201)
-        .send({ message: `Successfully created new user: ${userRecord.uid}` });
+    .then((uid) => {
+      return res.status(201).send({
+        message: `Successfully created new user: ${uid}`,
+      });
     })
     .catch((error) => {
-      console.log("Error creating new user:", error);
-      return res
-        .status(500)
-        .send({ message: `Error creating new user: ${error}` });
+      if (error.code == "auth/email-already-exists") {
+        return res.status(400).send(error);
+      }
+      return res.status(500).send(error);
+    });
+});
+
+// Firebase Authentication: Sign in user with email and password
+app.post("/signin", (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+      const uid = userCredential.user.uid;
+      return userCredential.user.getIdToken().then((idToken) => {
+        return res.status(200).send({
+          message: "Successfully signed in",
+          uid: uid,
+          token: idToken,
+        });
+      });
+    })
+    .catch((error) => {
+      if (
+        error.code === "auth/user-not-found" ||
+        error.code === "auth/wrong-password"
+      ) {
+        return res.status(401).send({
+          error: "Invalid email or password",
+        });
+      }
+      return res.status(500).send(error);
     });
 });
 
