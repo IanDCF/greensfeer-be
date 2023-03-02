@@ -1,7 +1,8 @@
 const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
-const userRoute = require("./routes/userRoute");
+const app = express();
+// const admin = require("firebase-admin");
 
 const {
   initializeApp,
@@ -15,7 +16,8 @@ initializeApp({
   credential: cert(serviceAccount),
 });
 
-const app = express();
+// location of routing important; don't require route before app is initialized
+const userRoute = require("./routes/userRoute");
 
 const corsOptions = {
   origin: true,
