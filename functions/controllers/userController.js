@@ -6,6 +6,10 @@ const {
 } = require("firebase-admin/firestore");
 const db = getFirestore();
 
+exports.test = (_req, res) => {
+  res.send("req received");
+};
+
 // Create => POST
 exports.newUser = (req, res) => {
   const userId = uuidv4();
