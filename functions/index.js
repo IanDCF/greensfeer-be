@@ -95,34 +95,24 @@ app.post("/register", (req, res) => {
     });
 });
 
-// Firebase Authentication: Sign in user with email and password
-app.post("/signin", (req, res) => {
+// User Authentication => return user custom id token
+app.post("/login", (req, res) => {
   const email = req.body.email;
   const password = req.body.password;
 
-  firebase
+  admin
     .auth()
-    .signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-      const uid = userCredential.user.uid;
-      return userCredential.user.getIdToken().then((idToken) => {
-        return res.status(200).send({
-          message: "Successfully signed in",
-          uid: uid,
-          token: idToken,
-        });
-      });
+    .getUserByEmail(email)
+    .then((userRecord) => {
+      const uid = userRecord.uid;
+      return admin.auth().createCustomToken(uid);
+    })
+    .then((customToken) => {
+      res.send({ customToken });
     })
     .catch((error) => {
-      if (
-        error.code === "auth/user-not-found" ||
-        error.code === "auth/wrong-password"
-      ) {
-        return res.status(401).send({
-          error: "Invalid email or password",
-        });
-      }
-      return res.status(500).send(error);
+      console.error(`Error logging in: ${error}`);
+      res.status(401).send("Invalid email or password");
     });
 });
 
