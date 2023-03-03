@@ -85,7 +85,7 @@ exports.queryMarketPost = async (req, res) => {
 };
 
 // All users
-exports.exports.allMarketPosts = async (req, res) => {
+exports.allMarketPosts = async (req, res) => {
   try {
     const snapshot = await db.collection("market_posts").get();
     const marketPosts = [];
