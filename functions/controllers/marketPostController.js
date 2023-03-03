@@ -6,7 +6,7 @@ const {
 } = require("firebase-admin/firestore");
 const db = getFirestore();
 
-const marketPostRef = db.collection("market_post");
+const marketPostRef = db.collection("market_posts");
 /* Create Marketplace posts from marketplace?? */
 // Create => POST
 exports.newMarketPost = (req, res) => {
@@ -49,7 +49,7 @@ exports.newMarketPost = (req, res) => {
 
 // Read => GET
 // Single User with ID
-exports.queryMarketPost = (req, res) => {
+exports.subsetMarketPost = async (req, res) => {
   const postType = req.body.post_type;
   const postCategory = req.body.post_category;
   const epType = req.body.ep_type;
@@ -62,79 +62,64 @@ exports.queryMarketPost = (req, res) => {
   const stateProvince = req.body.state_province;
   const country = req.body.country;
 
-  // Add filters to the query based on the provided parameters
+  let subset = marketPostRef;
+
   if (postType) {
-    query = marketPostRef.where("post_type", "==", postType);
+    subset = subset.where("post_type", "==", postType);
   }
-
   if (postCategory) {
-    query = marketPostRef.where("post_category", "==", postCategory);
+    subset = subset.where("post_category", "==", postCategory);
+  }
+  // if (epType) {
+  //   subset = subset.where("p.ep_type", "==", epType);
+  // }
+
+  // if (verificationStandard) {
+  //   subset = subset.where(
+  //     "p.verification_standard",
+  //     "==",
+  //     verificationStandard
+  //   );
+  // }
+
+  // if (methodology) {
+  //   subset = subset.where("p.methodology", "==", methodology);
+  // }
+
+  // if (creditVolume) {
+  //   subset = subset.where("p.credit_volume", "==", parseInt(creditVolume));
+  // }
+
+  // if (pricePerCredit) {
+  //   subset = subset.where("p.price_per_credit", "==", parseInt(pricePerCredit));
+  // }
+
+  // if (expiryDate) {
+  //   subset = subset.where("expiry_date", "<=", expiryDate);
+  // }
+
+  // if (city) {
+  //   subset = subset.where("location.city", "==", city);
+  // }
+
+  // if (stateProvince) {
+  //   subset = subset.where("location.state_province", "==", stateProvince);
+  // }
+
+  // if (country) {
+  //   subset = subset.where("location.country", "==", country);
+  // }
+
+  const snapshot = await subset.get();
+  if (snapshot.empty) {
+    console.log("No matching documents.");
+    return res.status(404).send();
   }
 
-  if (epType) {
-    query = marketPostRef.where("p.ep_type", "==", epType);
-  }
-
-  if (verificationStandard) {
-    query = marketPostRef.where(
-      "p.verification_standard",
-      "==",
-      verificationStandard
-    );
-  }
-
-  if (methodology) {
-    query = marketPostRef.where("p.methodology", "==", methodology);
-  }
-
-  if (creditVolume) {
-    query = marketPostRef.where(
-      "p.credit_volume",
-      "==",
-      parseInt(creditVolume)
-    );
-  }
-
-  if (pricePerCredit) {
-    query = marketPostRef.where(
-      "p.price_per_credit",
-      "==",
-      parseInt(pricePerCredit)
-    );
-  }
-
-  if (expiryDate) {
-    query = marketPostRef.where("expiry_date", "<=", expiryDate);
-  }
-
-  if (city) {
-    query = marketPostRef.where("location.city", "==", city);
-  }
-
-  if (stateProvince) {
-    query = marketPostRef.where("location.state_province", "==", stateProvince);
-  }
-
-  if (country) {
-    query = marketPostRef.where("location.country", "==", country);
-  }
-
-  // Execute the query
-  marketPostRef
-    .get()
-    .then((querySnapshot) => {
-      const results = [];
-      querySnapshot.forEach((doc) => {
-        console.log(doc.data());
-        const data = doc.data();
-        results.push(data);
-      });
-      res.status(200).json(results);
-    })
-    .catch((error) => {
-      console.error(error);
-      res.status(500).send("Error fetching market posts");
-    });
+  snapshot.forEach((doc) => {
+    console.log(doc.id, "=>", doc.data());
+  });
+  return res.status(302).send();
 };
 
 // All users
