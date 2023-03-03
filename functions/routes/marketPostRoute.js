@@ -5,10 +5,8 @@ router
   .route("/")
   .get(marketPostController.allMarketPosts)
   .post(marketPostController.newMarketPost);
-// router
-//   .route("/:id")
-//   .get(marketPostController.singleMarketPost)
+router.route("/query").get(marketPostController.queryMarketPost);
 //   .patch(marketPostController.updateMarketPost)
 //   .delete(marketPostController.deleteMarketPost);
-router.route("/query").get(marketPostController.queryMarketPost);
+
 module.exports = router;
