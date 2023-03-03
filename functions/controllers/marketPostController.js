@@ -50,7 +50,7 @@ exports.newMarketPost = (req, res) => {
 
 // Read => GET
 // Single User with ID
-exports.subsetMarketPost = async (req, res) => {
+exports.queryMarketPost = async (req, res) => {
   const postType = req.body.post_type;
   const postCategory = req.body.post_category;
   const epType = req.body.ep_type;
@@ -71,45 +71,6 @@ exports.subsetMarketPost = async (req, res) => {
   if (postCategory) {
     subset = subset.where("post_category", "==", postCategory);
   }
-  // if (epType) {
-  //   subset = subset.where("p.ep_type", "==", epType);
-  // }
-
-  // if (verificationStandard) {
-  //   subset = subset.where(
-  //     "p.verification_standard",
-  //     "==",
-  //     verificationStandard
-  //   );
-  // }
-
-  // if (methodology) {
-  //   subset = subset.where("p.methodology", "==", methodology);
-  // }
-
-  // if (creditVolume) {
-  //   subset = subset.where("p.credit_volume", "==", parseInt(creditVolume));
-  // }
-
-  // if (pricePerCredit) {
-  //   subset = subset.where("p.price_per_credit", "==", parseInt(pricePerCredit));
-  // }
-
-  // if (expiryDate) {
-  //   subset = subset.where("expiry_date", "<=", expiryDate);
-  // }
-
-  // if (city) {
-  //   subset = subset.where("location.city", "==", city);
-  // }
-
-  // if (stateProvince) {
-  //   subset = subset.where("location.state_province", "==", stateProvince);
-  // }
-
-  // if (country) {
-  //   subset = subset.where("location.country", "==", country);
-  // }
 
   const snapshot = await subset.get();
   if (snapshot.empty) {
