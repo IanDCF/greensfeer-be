@@ -11,18 +11,22 @@ const marketPostRef = db.collection("market_posts");
 /* authentication required  */
 // Create => POST
 exports.newMarketPost = (req, res) => {
-  const {
-    city,
-    country,
-    description,
-    ep_type,
-    modular_benefits,
-    name,
-    post_category,
-    post_type,
-    source_link,
-    user_id,
-  } = req.body;
+  const user_id = req.body.user_id;
+  const company_id = req.body.company_id;
+  const description = req.body.description;
+
+  const city = req.body.location.city;
+  const country = req.body.location.country;
+  const post_type = req.body.post_type;
+  const post_category = req.body.post_category;
+  const ep_type = req.body.p.ep_type;
+  const verification_standard = req.body.p.verification_standard;
+  const methodology = req.body.p.methodology;
+  const credit_volume = req.body.p.credit_volume;
+  const price_per_credit = req.body.p.price_per_credit;
+  const expiry_date = req.body.p.expiry_date;
+  const state_province = req.body.location.state_province;
+
   const marketPostId = uuidv4();
   marketPostRef
     .doc(`${marketPostId}`)
@@ -31,12 +35,16 @@ exports.newMarketPost = (req, res) => {
       country,
       description,
       ep_type,
-      modular_benefits,
-      name,
       post_category,
       post_type,
-      source_link,
       user_id,
+      verification_standard,
+      methodology,
+      credit_volume,
+      price_per_credit,
+      expiry_date,
+      state_province,
+      company_id,
     })
     .then(() => {
       console.log(`User ${marketPostId} successfully created`);
@@ -53,15 +61,15 @@ exports.newMarketPost = (req, res) => {
 exports.queryMarketPost = async (req, res) => {
   const postType = req.body.post_type;
   const postCategory = req.body.post_category;
-  const epType = req.body.ep_type;
-  const verificationStandard = req.body.verification_standard;
-  const methodology = req.body.methodology;
-  const creditVolume = req.body.credit_volume;
-  const pricePerCredit = req.body.price_per_credit;
-  const expiryDate = req.body.expiry_date;
-  const city = req.body.city;
-  const stateProvince = req.body.state_province;
-  const country = req.body.country;
+  const epType = req.body.p.ep_type;
+  const verificationStandard = req.body.p.verification_standard;
+  const methodology = req.body.p.methodology;
+  const creditVolume = req.body.p.credit_volume;
+  const pricePerCredit = req.body.p.price_per_credit;
+  const expiryDate = req.body.p.expiry_date;
+  const city = req.body.location.city;
+  const stateProvince = req.body.location.state_province;
+  const country = req.body.location.country;
 
   let subset = marketPostRef;
 
@@ -70,6 +78,45 @@ exports.queryMarketPost = async (req, res) => {
   }
   if (postCategory) {
     subset = subset.where("post_category", "==", postCategory);
+  }
+  if (epType) {
+    subset = subset.where("p.ep_type", "==", epType);
+  }
+
+  if (verificationStandard) {
+    subset = subset.where(
+      "p.verification_standard",
+      "==",
+      verificationStandard
+    );
+  }
+
+  if (methodology) {
+    subset = subset.where("p.methodology", "==", methodology);
+  }
+
+  if (creditVolume) {
+    subset = subset.where("p.credit_volume", "==", parseInt(creditVolume));
+  }
+
+  if (pricePerCredit) {
+    subset = subset.where("p.price_per_credit", "==", parseInt(pricePerCredit));
+  }
+
+  if (expiryDate) {
+    subset = subset.where("expiry_date", "<=", expiryDate);
+  }
+
+  if (city) {
+    subset = subset.where("location.city", "==", city);
+  }
+
+  if (stateProvince) {
+    subset = subset.where("location.state_province", "==", stateProvince);
+  }
+
+  if (country) {
+    subset = subset.where("location.country", "==", country);
   }
 
   const snapshot = await subset.get();

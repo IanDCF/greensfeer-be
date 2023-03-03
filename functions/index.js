@@ -33,16 +33,13 @@ app.use(cors(corsOptions));
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-// User Route
-app.use("/api/user", userRoute);
-
 // Home Route
 app.get("/", (req, res) => {
   return res.status(200).send("Greensfeer Backend");
 });
 
 // User Route
-app.use("/user", userRoute);
+app.use("/api/user", userRoute);
 
 // Market Post Route
 app.use("/api/marketplace", marketPostRoute);
