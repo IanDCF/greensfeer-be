@@ -1,11 +1,14 @@
 const router = require("express").Router();
-const userController = require("../controllers/marketPostController");
+const marketPostController = require("../controllers/marketPostController");
 
-router.route("/").get(userController.allMarketPosts).post(userController.newMarketPost);
+router
+  .route("/")
+  .get(marketPostController.allMarketPosts)
+  .post(marketPostController.newMarketPost);
 // router
 //   .route("/:id")
-//   .get(userController.singleMarketPost)
-//   .patch(userController.updateMarketPost)
-//   .delete(userController.deleteMarketPost);
-
+//   .get(marketPostController.singleMarketPost)
+//   .patch(marketPostController.updateMarketPost)
+//   .delete(marketPostController.deleteMarketPost);
+router.route("/query").get(marketPostController.queryMarketPost);
 module.exports = router;

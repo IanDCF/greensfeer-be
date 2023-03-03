@@ -6,7 +6,10 @@ const {
 } = require("firebase-admin/firestore");
 const db = getFirestore();
 
+const marketPostRef = db.collection("market_posts");
+
 /* Create Marketplace posts from marketplace?? */
+/* authentication required  */
 // Create => POST
 exports.newMarketPost = (req, res) => {
   const {
@@ -22,7 +25,7 @@ exports.newMarketPost = (req, res) => {
     user_id,
   } = req.body;
   const marketPostId = uuidv4();
-  db.collection("market_posts")
+  marketPostRef
     .doc(`${marketPostId}`)
     .set({
       city,
@@ -67,7 +70,7 @@ exports.newMarketPost = (req, res) => {
 // };
 
 // All users
-exports.allMarketPosts = async (req, res) => {
+exports.exports.allMarketPosts = async (req, res) => {
   try {
     const snapshot = await db.collection("market_posts").get();
     const marketPosts = [];
