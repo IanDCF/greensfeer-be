@@ -6,49 +6,90 @@ const {
 } = require("firebase-admin/firestore");
 const db = getFirestore();
 
-const marketPostRef = db.collection("market_posts");
-/* Create Marketplace posts from marketplace?? */
-/* authentication required  */
-// Create => POST
+const marketPostRef = db.collection("market_post");
+/* Create Marketplace posts from company page*/
+/* authentication required: definitely  */
+
+// POST: create new market post doc in ‘market_post’ collection
 exports.newMarketPost = (req, res) => {
   const user_id = req.body.user_id;
   const company_id = req.body.company_id;
-  const description = req.body.description;
-
-  const city = req.body.location.city;
-  const country = req.body.location.country;
+  const image = req.body.image;
+  const post_name = req.body.post_name;
   const post_type = req.body.post_type;
   const post_category = req.body.post_category;
-  const ep_type = req.body.p.ep_type;
-  const verification_standard = req.body.p.verification_standard;
-  const methodology = req.body.p.methodology;
-  const credit_volume = req.body.p.credit_volume;
-  const price_per_credit = req.body.p.price_per_credit;
-  const expiry_date = req.body.p.expiry_date;
-  const state_province = req.body.location.state_province;
+  const description = req.body.description;
+  const ep_type = req.body.p.ep_type ? req.body.p.ep_type : "";
+  const verification_standard = req.body.p.verification_standard
+    ? req.body.p.verification_standard
+    : "";
+  const methodology = req.body.p.methodology ? req.body.p.methodology : "";
+  const offset_type = req.body.p.offset_type ? req.body.p.offset_type : "";
+  const offset_unit = req.body.p.offset_unit ? req.body.p.offset_unit : "";
+  const credit_unit = req.body.p.credit_unit ? req.body.p.credit_unit : "";
+  const credit_volume = req.body.p.credit_volume
+    ? req.body.p.credit_volume
+    : "";
+  const price_per_credit = req.body.p.price_per_credit
+    ? req.body.p.price_per_credit
+    : "";
+  const total_price = price_per_credit * credit_volume ? req.body.p : "";
+  const vintage_year = req.body.p.vintage_year ? req.body.p.vintage_year : "";
+  const modular_benefits = req.body.p.modular_benefits
+    ? req.body.p.modular_benefits
+    : "";
+  const project_start_date = req.body.p.project_start_date
+    ? req.body.p.project_start_date
+    : "";
+  const project_end_date = req.body.p.project_end_date
+    ? req.body.p.project_end_date
+    : "";
+  const issuance_date = req.body.p.issuance_date
+    ? req.body.p.issuance_date
+    : "";
+  const expiry_date = req.body.p.expiry_date ? req.body.p.expiry_date : "";
+  const link = req.body.link;
+  const location = req.body.location;
+  const contact = req.body.contact;
+  const created_at = req.body.created_at;
 
-  const marketPostId = uuidv4();
+  const market_post_id = uuidv4();
   marketPostRef
-    .doc(`${marketPostId}`)
+    .doc(`${market_post_id}`)
     .set({
-      city,
-      country,
+      market_post_id,
+      user_id,
+      company_id,
+      image,
+      post_name,
+      post_type,
+      post_category,
       description,
       ep_type,
-      post_category,
-      post_type,
-      user_id,
       verification_standard,
       methodology,
+      offset_type,
+      offset_unit,
+      credit_unit,
       credit_volume,
       price_per_credit,
+      total_price,
+      vintage_year,
+      modular_benefits,
+      project_start_date,
+      project_end_date,
+      issuance_date,
       expiry_date,
-      state_province,
-      company_id,
+      link,
+      location,
+      contact,
+      created_at,
     })
     .then(() => {
-      console.log(`User ${marketPostId} successfully created`);
-      return res.status(200).send(`User ${marketPostId} successfully created`);
+      console.log(`New market post: ${market_post_id} successfully created`);
+      return res
+        .status(200)
+        .send(`New market post: ${market_post_id} successfully created`);
     })
     .catch((err) => {
       console.log(err);

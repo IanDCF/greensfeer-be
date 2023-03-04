@@ -42,7 +42,7 @@ app.get("/", (req, res) => {
 app.use("/api/user", userRoute);
 
 // Market Post Route
-app.use("/api/marketplace", marketPostRoute);
+app.use("/api/market_post", marketPostRoute);
 
 // Export API to Firebase Cloud Functions
 exports.app = functions.https.onRequest(app);
