@@ -155,17 +155,20 @@ exports.queryMarketPost = async (req, res) => {
 
 // GET: All market posts
 exports.allMarketPosts = async (req, res) => {
-  try {
-    const snapshot = await db.collection("market_posts").get();
-    const marketPosts = [];
-    snapshot.forEach((doc) => {
-      marketPosts.push(doc.data());
+  db.collection("market_post")
+    .get()
+    .then((snapshot) => {
+      const marketPosts = [];
+      snapshot.forEach((doc) => {
+        console.log(doc.data());
+        marketPosts.push(doc.data());
+      });
+      return res.status(200).send(marketPosts);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ error: "Server error" });
     });
-    return res.status(200).send(users);
-  } catch (err) {
-    console.error(err);
-    return res.status(500).send({ error: "Server error" });
-  }
 };
 
 // GET: All market posts of single company
