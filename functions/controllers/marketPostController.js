@@ -77,18 +77,21 @@ exports.queryMarketPost = async (req, res) => {
   // }
   const filterParams = req.body;
   let subset = marketPostRef;
+  let params = [];
 
   for (const property in filterParams) {
     console.log(property);
-    //subset = subset.where(`"${property}", "==", property`)
+    // params.push(property);
+    subset = subset.where(`"${property}"`, "==", `${property}`);
   }
-
-  if (postType) {
-    subset = subset.where("post_type", "==", postType);
-  }
-  if (postCategory) {
-    subset = subset.where("post_category", "==", postCategory);
-  }
+  // subset = subset.where(`"${params[0]}"`, "==", `${params[0]}`);
+  console.log(subset.get());
+  // if (postType) {
+  //   subset = subset.where("post_type", "==", postType);
+  // }
+  // if (postCategory) {
+  //   subset = subset.where("post_category", "==", postCategory);
+  // }
   //   if (epType) {
   //     subset = subset.where("p.ep_type", "==", epType);
   //   }
@@ -132,7 +135,7 @@ exports.queryMarketPost = async (req, res) => {
   const snapshot = await subset.get();
   if (snapshot.empty) {
     console.log("No matching documents.");
-    return res.status(404).send();
+    return res.status(404).send(`${filterParams} \n ${subset}`);
   }
 
   snapshot.forEach((doc) => {
@@ -149,7 +152,7 @@ exports.allMarketPosts = async (req, res) => {
     snapshot.forEach((doc) => {
       marketPosts.push(doc.data());
     });
-    return res.status(200).send(users);
+    return res.status(200).send(marketPosts);
   } catch (err) {
     console.error(err);
     return res.status(500).send({ error: "Server error" });
