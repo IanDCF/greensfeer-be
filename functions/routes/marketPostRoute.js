@@ -9,5 +9,6 @@ router.route("/query").get(marketPostController.queryMarketPost);
 //   .patch(marketPostController.updateMarketPost)
 //   .delete(marketPostController.deleteMarketPost);
 router.route("/:company_id").get(marketPostController.allCompanyMarketPosts);
+router.route("/:market_post_id").patch(marketPostController.updateMarketPost);
 
 module.exports = router;

@@ -155,7 +155,7 @@ exports.queryMarketPost = async (req, res) => {
 
 // GET: All market posts
 exports.allMarketPosts = async (req, res) => {
-  db.collection("market_post")
+  marketPostRef
     .get()
     .then((snapshot) => {
       const marketPosts = [];
@@ -173,7 +173,7 @@ exports.allMarketPosts = async (req, res) => {
 
 // GET: All market posts of single company
 exports.allCompanyMarketPosts = (req, res) => {
-  db.collection("market_post")
+  marketPostRef
     .where("company_id", "==", req.params.company_id)
     .get()
     .then((snapshot) => {
@@ -190,23 +190,28 @@ exports.allCompanyMarketPosts = (req, res) => {
     });
 };
 
-// Update => PATCH
-exports.updateUser = (req, res) => {
+// PATCH: a single market post's details
+exports.updateMarketPost = (req, res) => {
   const updateObject = req.body;
-  db.collection("user")
-    .doc(req.params.id)
+  marketPostRef
+    .doc(req.params.market_post_id)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        const userRef = db.collection("user").doc(req.params.id);
-        return userRef.update(updateObject);
+        const marketPostRef = db
+          .collection("market_post")
+          .doc(req.params.market_post_id);
+        return marketPostRef.update(updateObject);
       } else {
-        return res.status(404).send({ error: "User not found" });
+        return res.status(404).send({ error: "Market Post not found" });
       }
     })
     .then(() => {
-      console.log(`User ${req.params.id} has been updated`);
-      return res.status(200).send(`User ${req.params.id} has been updated`);
+      console.log(`Market Post: ${req.params.id} has been updated`);
+      return res.status(200).send({
+        status: 200,
+        message: `User ${req.params.id} has been updated`,
+      });
     })
     .catch((err) => {
       console.error(err);
