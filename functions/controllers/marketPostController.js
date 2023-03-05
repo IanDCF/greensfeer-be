@@ -1,9 +1,11 @@
 const { v4: uuidv4 } = require("uuid");
+
 const {
   getFirestore,
   Timestamp,
   FieldValue,
 } = require("firebase-admin/firestore");
+const { query } = require("express");
 const db = getFirestore();
 
 const marketPostRef = db.collection("market_post");
@@ -19,35 +21,7 @@ exports.newMarketPost = (req, res) => {
   const post_type = req.body.post_type;
   const post_category = req.body.post_category;
   const description = req.body.description;
-  const ep_type = req.body.p.ep_type ? req.body.p.ep_type : "";
-  const verification_standard = req.body.p.verification_standard
-    ? req.body.p.verification_standard
-    : "";
-  const methodology = req.body.p.methodology ? req.body.p.methodology : "";
-  const offset_type = req.body.p.offset_type ? req.body.p.offset_type : "";
-  const offset_unit = req.body.p.offset_unit ? req.body.p.offset_unit : "";
-  const credit_unit = req.body.p.credit_unit ? req.body.p.credit_unit : "";
-  const credit_volume = req.body.p.credit_volume
-    ? req.body.p.credit_volume
-    : "";
-  const price_per_credit = req.body.p.price_per_credit
-    ? req.body.p.price_per_credit
-    : "";
-  const total_price = price_per_credit * credit_volume ? req.body.p : "";
-  const vintage_year = req.body.p.vintage_year ? req.body.p.vintage_year : "";
-  const modular_benefits = req.body.p.modular_benefits
-    ? req.body.p.modular_benefits
-    : "";
-  const project_start_date = req.body.p.project_start_date
-    ? req.body.p.project_start_date
-    : "";
-  const project_end_date = req.body.p.project_end_date
-    ? req.body.p.project_end_date
-    : "";
-  const issuance_date = req.body.p.issuance_date
-    ? req.body.p.issuance_date
-    : "";
-  const expiry_date = req.body.p.expiry_date ? req.body.p.expiry_date : "";
+  const p = req.body.p;
   const link = req.body.link;
   const location = req.body.location;
   const contact = req.body.contact;
@@ -65,21 +39,7 @@ exports.newMarketPost = (req, res) => {
       post_type,
       post_category,
       description,
-      ep_type,
-      verification_standard,
-      methodology,
-      offset_type,
-      offset_unit,
-      credit_unit,
-      credit_volume,
-      price_per_credit,
-      total_price,
-      vintage_year,
-      modular_benefits,
-      project_start_date,
-      project_end_date,
-      issuance_date,
-      expiry_date,
+      p,
       link,
       location,
       contact,
@@ -97,87 +57,103 @@ exports.newMarketPost = (req, res) => {
     });
 };
 
-// Read => GET
-// query market posts and return results
+// GET: query market posts with URL params (filtered search)
 exports.queryMarketPost = async (req, res) => {
-  const postType = req.body.post_type;
-  const postCategory = req.body.post_category;
-  /* Need some sort of short circuit on query parameters; if request is not type product it searches for undefined properties*/
-  if (req.body.p) {
-    const epType = req.body.p.ep_type;
-    const verificationStandard = req.body.p.verification_standard;
-    const methodology = req.body.p.methodology;
-    const creditVolume = req.body.p.credit_volume;
-    const pricePerCredit = req.body.p.price_per_credit;
-    const expiryDate = req.body.p.expiry_date;
-  }
-  if (req.body.location) {
-    const city = req.body.location.city;
-    const stateProvince = req.body.location.state_province;
-    const country = req.body.location.country;
-  }
+  const post_type = req.body.post_type ? req.body.post_type : "";
+  const post_category = req.body.post_category ? req.body.post_category : "";
+  const ep_type = req.body.p ? req.body.p.ep_type : "";
+  const verification_standard = req.body.p
+    ? req.body.p.verification_standard
+    : "";
+  const methodology = req.body.p ? req.body.p.methodology : "";
+  const credit_volume = req.body.p ? req.body.p.credit_volume : "";
+  const price_per_credit = req.body.p ? req.body.p.price_per_credit : "";
+  const expiry_date = req.body.p ? req.body.p.expiry_date : "";
+
+  const city = req.body.location ? req.body.location.city : "";
+  const stateProvince = req.body.location
+    ? req.body.location.state_province
+    : "";
+  const country = req.body.location ? req.body.location.country : "";
 
   let subset = marketPostRef;
 
-  if (postType) {
-    subset = subset.where("post_type", "==", postType);
+  // const queryArray = [];
+
+  if (post_type !== "") {
+    subset = subset.where("post_type", "==", post_type);
   }
-  if (postCategory) {
-    subset = subset.where("post_category", "==", postCategory);
+  if (post_category !== "") {
+    subset = subset.where("post_category", "==", post_category);
   }
-  //   if (epType) {
-  //     subset = subset.where("p.ep_type", "==", epType);
-  //   }
+  if (ep_type !== "") {
+    subset = subset.where("p.ep_type", "==", ep_type);
+  }
 
-  //   if (verificationStandard) {
-  //     subset = subset.where(
-  //       "p.verification_standard",
-  //       "==",
-  //       verificationStandard
-  //     );
-  //   }
+  if (verification_standard !== "") {
+    subset = subset.where(
+      "p.verification_standard",
+      "==",
+      verification_standard
+    );
+  }
 
-  //   if (methodology) {
-  //     subset = subset.where("p.methodology", "==", methodology);
-  //   }
+  if (methodology !== "") {
+    subset = subset.where("p.methodology", "==", methodology);
+  }
 
-  //   if (creditVolume) {
-  //     subset = subset.where("p.credit_volume", "==", parseInt(creditVolume));
-  //   }
+  if (credit_volume !== "") {
+    subset = subset.where("p.credit_volume", "==", parseInt(credit_volume));
+  }
 
-  //   if (pricePerCredit) {
-  //     subset = subset.where("p.price_per_credit", "==", parseInt(pricePerCredit));
-  //   }
+  if (price_per_credit !== "") {
+    subset = subset.where(
+      "p.price_per_credit",
+      "==",
+      parseInt(price_per_credit)
+    );
+  }
 
-  //   if (expiryDate) {
-  //     subset = subset.where("expiry_date", "<=", expiryDate);
-  //   }
+  if (expiry_date !== "") {
+    subset = subset.where("expiry_date", "<=", expiry_date);
+  }
 
-  //   if (city) {
-  //     subset = subset.where("location.city", "==", city);
-  //   }
+  if (city !== "") {
+    subset = subset.where("location.city", "==", city);
+  }
 
-  //   if (stateProvince) {
-  //     subset = subset.where("location.state_province", "==", stateProvince);
-  //   }
+  if (stateProvince !== "") {
+    subset = subset.where("location.state_province", "==", stateProvince);
+  }
 
-  //   if (country) {
-  //     subset = subset.where("location.country", "==", country);
-  //   }
+  if (country !== "") {
+    subset = subset.where("location.country", "==", country);
+  }
+
+  // if (queryArray.length > 0) {
+  //   const queryRefs = queryArray.map((query) => query.get());
+  //   const queryDocs = await Promise.all(queryRefs);
+  //   const docIds = queryDocs.map((doc) => doc.id);
+  //   subset = subset.where(db.FieldPath.documentId(), "in", docIds);
+  // }
 
   const snapshot = await subset.get();
+
   if (snapshot.empty) {
     console.log("No matching documents.");
     return res.status(404).send();
   }
 
+  const result = [];
+
   snapshot.forEach((doc) => {
-    console.log(doc.id, "=>", doc.data());
+    result.push(doc.data());
   });
-  return res.status(302).send(`hi \n ${req.body.post_type}`);
+
+  return res.status(302).send(result);
 };
 
-// All users
+// GET: All market posts of a single company
 exports.allMarketPosts = async (req, res) => {
   try {
     const snapshot = await db.collection("market_posts").get();
