@@ -59,24 +59,29 @@ exports.newMarketPost = (req, res) => {
 // Read => GET
 // query market posts and return results
 exports.queryMarketPost = async (req, res) => {
-  const postType = req.body.post_type;
-  const postCategory = req.body.post_category;
-  /* Need some sort of short circuit on query parameters; if request is not type product it searches for undefined properties*/
-  if (req.body.p) {
-    const epType = req.body.p.ep_type;
-    const verificationStandard = req.body.p.verification_standard;
-    const methodology = req.body.p.methodology;
-    const creditVolume = req.body.p.credit_volume;
-    const pricePerCredit = req.body.p.price_per_credit;
-    const expiryDate = req.body.p.expiry_date;
-  }
-  if (req.body.location) {
-    const city = req.body.location.city;
-    const stateProvince = req.body.location.state_province;
-    const country = req.body.location.country;
-  }
-
+  // const postType = req.body.post_type;
+  // const postCategory = req.body.post_category;
+  // /* Need some sort of short circuit on query parameters; if request is not type product it searches for undefined properties*/
+  // if (req.body.p) {
+  //   const epType = req.body.p.ep_type;
+  //   const verificationStandard = req.body.p.verification_standard;
+  //   const methodology = req.body.p.methodology;
+  //   const creditVolume = req.body.p.credit_volume;
+  //   const pricePerCredit = req.body.p.price_per_credit;
+  //   const expiryDate = req.body.p.expiry_date;
+  // }
+  // if (req.body.location) {
+  //   const city = req.body.location.city;
+  //   const stateProvince = req.body.location.state_province;
+  //   const country = req.body.location.country;
+  // }
+  const filterParams = req.body;
   let subset = marketPostRef;
+
+  for (const property in filterParams) {
+    console.log(property);
+    //subset = subset.where(`"${property}", "==", property`)
+  }
 
   if (postType) {
     subset = subset.where("post_type", "==", postType);
