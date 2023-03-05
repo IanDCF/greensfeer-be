@@ -5,13 +5,14 @@ router
   .route("/")
   .get(marketPostController.allMarketPosts)
   .post(marketPostController.newMarketPost);
-router.route("/query").get(marketPostController.queryMarketPost);
-//   .patch(marketPostController.updateMarketPost)
-//   .delete(marketPostController.deleteMarketPost);
-router.route("/:company_id").get(marketPostController.allCompanyMarketPosts);
 router
   .route("/:market_post_id")
+  .get(marketPostController.getMarketPost)
   .patch(marketPostController.updateMarketPost)
   .delete(marketPostController.deleteMarketPost);
+router.route("/query").get(marketPostController.queryMarketPost);
+router
+  .route("/company/:company_id")
+  .get(marketPostController.allCompanyMarketPosts);
 
 module.exports = router;

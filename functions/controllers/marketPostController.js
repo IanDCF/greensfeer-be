@@ -191,6 +191,25 @@ exports.allCompanyMarketPosts = (req, res) => {
     });
 };
 
+// GET: a single market post
+exports.getMarketPost = (req, res) => {
+  const marketPostId = req.params.market_post_id;
+  marketPostRef
+    .doc(marketPostId)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        return res.status(200).send({ ...doc.data() });
+      } else {
+        return res.status(404).send({ error: "Market Post not found" });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ error: "Server error" });
+    });
+};
+
 // PATCH: a single market post's details
 exports.updateMarketPost = (req, res) => {
   const updateObject = req.body;
