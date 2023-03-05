@@ -47,9 +47,10 @@ exports.newMarketPost = (req, res) => {
     })
     .then(() => {
       console.log(`New market post: ${market_post_id} successfully created`);
-      return res
-        .status(200)
-        .send(`New market post: ${market_post_id} successfully created`);
+      return res.status(200).send({
+        status: 200,
+        message: `New Market Post: ${market_post_id} has been created`,
+      });
     })
     .catch((err) => {
       console.log(err);
@@ -193,24 +194,23 @@ exports.allCompanyMarketPosts = (req, res) => {
 // PATCH: a single market post's details
 exports.updateMarketPost = (req, res) => {
   const updateObject = req.body;
+  const marketPostId = req.params.market_post_id;
   marketPostRef
-    .doc(req.params.market_post_id)
+    .doc(marketPostId)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        const marketPostRef = db
-          .collection("market_post")
-          .doc(req.params.market_post_id);
+        const marketPostRef = db.collection("market_post").doc(marketPostId);
         return marketPostRef.update(updateObject);
       } else {
         return res.status(404).send({ error: "Market Post not found" });
       }
     })
     .then(() => {
-      console.log(`Market Post: ${req.params.id} has been updated`);
+      console.log(`Market Post: ${marketPostId} has been updated`);
       return res.status(200).send({
         status: 200,
-        message: `User ${req.params.id} has been updated`,
+        message: `Market Post: ${marketPostId} has been updated`,
       });
     })
     .catch((err) => {
@@ -219,15 +219,18 @@ exports.updateMarketPost = (req, res) => {
     });
 };
 
-// Delete
-// Single User with ID
-exports.deleteUser = (req, res) => {
-  db.collection("user")
-    .doc(`${req.params.id}`)
+// DELETE: a single post
+exports.deleteMarketPost = (req, res) => {
+  const marketPostId = req.params.market_post_id;
+  marketPostRef
+    .doc(`${marketPostId}`)
     .delete()
     .then(() => {
-      console.log(`User ${req.params.id} has been deleted`);
-      return res.status(200).send(`User ${req.params.id} has been deleted`);
+      console.log(`Market Post: ${marketPostId} has been deleted`);
+      return res.status(200).send({
+        status: 200,
+        message: `Market Post: ${marketPostId} has been deleted`,
+      });
     })
     .catch((err) => {
       console.log(err);
