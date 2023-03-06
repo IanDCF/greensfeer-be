@@ -32,8 +32,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-// User Route
-app.use("/api/user", userRoute);
+// Company Route
+app.use("/api/company", companyRoute);
 
 // Home Route
 app.get("/", (req, res) => {
