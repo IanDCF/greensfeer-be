@@ -47,8 +47,8 @@ exports.newMarketPost = (req, res) => {
       company_id,
     })
     .then(() => {
-      console.log(`User ${marketPostId} successfully created`);
-      return res.status(200).send(`User ${marketPostId} successfully created`);
+      console.log(`Post ${marketPostId} successfully created`);
+      return res.status(200).send(`Post ${marketPostId} successfully created`);
     })
     .catch((err) => {
       console.log(err);
@@ -59,81 +59,28 @@ exports.newMarketPost = (req, res) => {
 // Read => GET
 // query market posts and return results
 exports.queryMarketPost = async (req, res) => {
-  const postType = req.body.post_type;
-  const postCategory = req.body.post_category;
-  /* Need some sort of short circuit on query parameters; if request is not type product it searches for undefined properties*/
-  if (req.body.p) {
-    const epType = req.body.p.ep_type;
-    const verificationStandard = req.body.p.verification_standard;
-    const methodology = req.body.p.methodology;
-    const creditVolume = req.body.p.credit_volume;
-    const pricePerCredit = req.body.p.price_per_credit;
-    const expiryDate = req.body.p.expiry_date;
-  }
-  if (req.body.location) {
-    const city = req.body.location.city;
-    const stateProvince = req.body.location.state_province;
-    const country = req.body.location.country;
-  }
-
+  const filterParams = req.body;
   let subset = marketPostRef;
+  const queryKeys = [];
+  const queryValues = [];
 
-  if (postType) {
-    subset = subset.where("post_type", "==", postType);
+  for (const property in filterParams) {
+    queryKeys.push(`"${property.toString()}"`);
+    queryValues.push(filterParams[property]);
   }
-  if (postCategory) {
-    subset = subset.where("post_category", "==", postCategory);
-  }
-  //   if (epType) {
-  //     subset = subset.where("p.ep_type", "==", epType);
-  //   }
+  console.log(queryKeys[0]);
 
-  //   if (verificationStandard) {
-  //     subset = subset.where(
-  //       "p.verification_standard",
-  //       "==",
-  //       verificationStandard
-  //     );
-  //   }
-
-  //   if (methodology) {
-  //     subset = subset.where("p.methodology", "==", methodology);
-  //   }
-
-  //   if (creditVolume) {
-  //     subset = subset.where("p.credit_volume", "==", parseInt(creditVolume));
-  //   }
-
-  //   if (pricePerCredit) {
-  //     subset = subset.where("p.price_per_credit", "==", parseInt(pricePerCredit));
-  //   }
-
-  //   if (expiryDate) {
-  //     subset = subset.where("expiry_date", "<=", expiryDate);
-  //   }
-
-  //   if (city) {
-  //     subset = subset.where("location.city", "==", city);
-  //   }
-
-  //   if (stateProvince) {
-  //     subset = subset.where("location.state_province", "==", stateProvince);
-  //   }
-
-  //   if (country) {
-  //     subset = subset.where("location.country", "==", country);
-  //   }
-
-  const snapshot = await subset.get();
+  // .where's field to filter on apparently *must* be format "field_name". template literals and variables will not work
+  const snapshot = await subset.where("post_type", "==", queryValues[0]).get();
   if (snapshot.empty) {
     console.log("No matching documents.");
     return res.status(404).send();
   }
-
+  filteredPosts = [];
   snapshot.forEach((doc) => {
-    console.log(doc.id, "=>", doc.data());
+    filteredPosts.push(doc.data());
   });
-  return res.status(302).send(`hi \n ${req.body.post_type}`);
+  return res.status(302).send(filteredPosts);
 };
 
 // All users
@@ -144,7 +91,7 @@ exports.allMarketPosts = async (req, res) => {
     snapshot.forEach((doc) => {
       marketPosts.push(doc.data());
     });
-    return res.status(200).send(users);
+    return res.status(200).send(marketPosts);
   } catch (err) {
     console.error(err);
     return res.status(500).send({ error: "Server error" });
