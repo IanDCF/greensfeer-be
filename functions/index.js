@@ -20,6 +20,7 @@ initializeApp({
 /*--- import routes after initializing app ---*/
 // location of routing important; don't require route before app is initialized
 const userRoute = require("./routes/userRoute");
+const affiliationRoute = require("./routes/affiliationRoute");
 
 const corsOptions = {
   origin: true,
@@ -34,6 +35,9 @@ app.use(express.json());
 
 // User Route
 app.use("/api/user", userRoute);
+
+// Affiliation Route
+app.use("/api/affiliation", affiliationRoute);
 
 // Home Route
 app.get("/", (req, res) => {
