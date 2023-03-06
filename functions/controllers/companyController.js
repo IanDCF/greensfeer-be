@@ -1,14 +1,46 @@
 const admin = require("firebase-admin");
+const { v4: uuidv4 } = require("uuid");
 const {
   getFirestore,
   Timestamp,
   FieldValue,
 } = require("firebase-admin/firestore");
 const db = getFirestore();
+const companyRef = db.collection("company");
 
 // POST: sent from user profile create new company
 exports.registerCompany = (req, res) => {
   //get all company fields
+  const {
+    name,
+    email,
+    website,
+    logo,
+    banner,
+    headline,
+    market_role,
+    location,
+    sector,
+    description,
+  } = req.body;
+  const company_id = uuidv4();
+  const created_at = new Date().toISOString();
+
+  companyRef.doc(`${company_id}`).set({
+    company_id,
+    name,
+    email,
+    website,
+    logo,
+    banner,
+    headline,
+    market_role,
+    location,
+    sector,
+    description,
+    created_at,
+  });
+
   //handle error
   //handle creation
 };
