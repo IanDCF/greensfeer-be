@@ -55,7 +55,7 @@ exports.registerCompany = (req, res) => {
   //handle creation
 };
 // GET: list of companies from company collection
-exports.allCompanies = (req, res) => {
+exports.allCompanies = (_req, res) => {
   companyRef
     .get()
     .then((snapshot) => {
@@ -67,14 +67,30 @@ exports.allCompanies = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).send(`error: ${err}`);
+      return res.status(500).send(`error: Server error`);
     });
 };
 
 // GET: single company details
 /* Any back end auth related features, or all front end?
 Handle auth within this: if authorized (affiliated) return more details */
-exports.singleCompany = (req, res) => {};
+exports.singleCompany = (req, res) => {
+  companyRef
+    .doc(req.params.id)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        console.log(`Company ${req.params.id} requested & found`);
+        return res.status(200).send(doc.data());
+      } else {
+        return res.status(404).send(`company not found`);
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ error: "Server error" });
+    });
+};
 
 // PATCH: single company details
 exports.updateCompany = (req, res) => {};
