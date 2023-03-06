@@ -93,4 +93,29 @@ exports.singleCompany = (req, res) => {
 };
 
 // PATCH: single company details
-exports.updateCompany = (req, res) => {};
+exports.updateCompany = (req, res) => {
+  const updateObject = req.body;
+  const companyId = req.params.id;
+  companyRef
+    .doc(companyId)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        const companyRef = db.collection("company").doc(companyId);
+        return companyRef.update(updateObject);
+      } else {
+        return res.status(404).send({ error: "Company not found" });
+      }
+    })
+    .then(() => {
+      console.log(`Company: ${companyId} has been updated`);
+      return res.status(200).send({
+        status: 200,
+        message: `Company: ${companyId} has been updated`,
+      });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ error: "Server error" });
+    });
+};
