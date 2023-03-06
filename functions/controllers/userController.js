@@ -5,37 +5,25 @@ const {
   FieldValue,
 } = require("firebase-admin/firestore");
 const db = getFirestore();
-
-const isEmpty = (str) => {
-  if (str === "") return true;
-};
+const { userSchema } = require('../schemas/userSchema')
 
 // Authentication: register new user
 // POST: create new user document in 'user' collection
 exports.registerUser = (req, res) => {
-  const password = req.body.password;
-  const confirm_password = req.body.confirm_password;
-  const user = {
+  const userBody = {
     first_name: req.body.first_name,
     last_name: req.body.last_name,
     email: req.body.email,
     created_at: new Date().toISOString(),
   };
+  const user = userSchema.safeParse(userBody)
 
-  let errors = {};
-
-  if (isEmpty(user.first_name))
-    errors.first_name = "First Name field must not be empty";
-  if (isEmpty(user.last_name))
-    errors.last_name = "Last Name field must not be empty";
-  if (password !== confirm_password) errors.password = "Passwords must match";
-
-  if (Object.keys(errors).length > 0)
-    return res.status(400).send({ error: errors });
-
+  if (!user.success) {
+    return res.status(400).send(user.error.errors);
+  }
   admin
     .auth()
-    .createUser(user)
+    .createUser(user.data)
     .then((userRecord) => {
       console.log(userRecord);
       const uid = userRecord.uid;
