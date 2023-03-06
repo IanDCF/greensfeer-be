@@ -26,26 +26,38 @@ exports.registerCompany = (req, res) => {
   const company_id = uuidv4();
   const created_at = new Date().toISOString();
 
-  companyRef.doc(`${company_id}`).set({
-    company_id,
-    name,
-    email,
-    website,
-    logo,
-    banner,
-    headline,
-    market_role,
-    location,
-    sector,
-    description,
-    created_at,
-  });
+  companyRef
+    .doc(`${company_id}`)
+    .set({
+      company_id,
+      name,
+      email,
+      website,
+      logo,
+      banner,
+      headline,
+      market_role,
+      location,
+      sector,
+      description,
+      created_at,
+    })
+    .then(() => {
+      console.log(`company created: ${company_id}`);
+      return res.status(200).send(`company created: ${company_id}`);
+    })
+    .catch((err) => {
+      console.log(err);
+      return res.status(500).send(err);
+    });
 
   //handle error
   //handle creation
 };
 // GET: list of companies from company collection
-exports.allCompanies = (req, res) => {};
+exports.allCompanies = (req, res) => {
+  companyRef.get().then(console.log(snapshot));
+};
 
 // GET: single company details
 /* Any back end auth related features, or all front end?

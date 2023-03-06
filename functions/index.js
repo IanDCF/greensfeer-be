@@ -19,7 +19,8 @@ initializeApp({
 
 /*--- import routes after initializing app ---*/
 // location of routing important; don't require route before app is initialized
-const userRoute = require("./routes/userRoute");
+// const userRoute = require("./routes/userRoute");
+const companyRoute = require("./routes/companyRoute");
 
 const corsOptions = {
   origin: true,
