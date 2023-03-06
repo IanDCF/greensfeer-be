@@ -74,7 +74,7 @@ exports.queryMarketPost = async (req, res) => {
   const snapshot = await subset.where("post_type", "==", queryValues[0]).get();
   if (snapshot.empty) {
     console.log("No matching documents.");
-    return res.status(404).send();
+    return res.status(404).send(`${filterParams} \n ${subset}`);
   }
   filteredPosts = [];
   snapshot.forEach((doc) => {
