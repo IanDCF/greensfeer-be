@@ -3,6 +3,7 @@ const {
   getFirestore,
   Timestamp,
   FieldValue,
+  FieldPath,
 } = require("firebase-admin/firestore");
 const db = getFirestore();
 
@@ -65,13 +66,13 @@ exports.queryMarketPost = async (req, res) => {
   const queryValues = [];
 
   for (const property in filterParams) {
-    queryKeys.push(`"${property.toString()}"`);
+    queryKeys.push(new FieldPath(property));
     queryValues.push(filterParams[property]);
   }
   console.log(queryKeys[0]);
 
   // .where's field to filter on apparently *must* be format "field_name". template literals and variables will not work
-  const snapshot = await subset.where("post_type", "==", queryValues[0]).get();
+  const snapshot = await subset.where(queryKeys[0], "==", queryValues[0]).get();
   if (snapshot.empty) {
     console.log("No matching documents.");
     return res.status(404).send(`${filterParams} \n ${subset}`);
