@@ -23,7 +23,7 @@ exports.newMarketPost = (req, res) => {
   const description = req.body.description;
   const p = req.body.p;
   const link = req.body.link;
-  const location = req.body.location;
+  const location = req.body;
   const contact = req.body.contact;
   const created_at = req.body.created_at;
 
@@ -62,24 +62,22 @@ exports.newMarketPost = (req, res) => {
 exports.queryMarketPost = async (req, res) => {
   const post_type = req.body.post_type ? req.body.post_type : "";
   const post_category = req.body.post_category ? req.body.post_category : "";
-  const ep_type = req.body.p ? req.body.p.ep_type : "";
-  const verification_standard = req.body.p
-    ? req.body.p.verification_standard
+  const ep_type = req.body.ep_type ? req.body.ep_type : "";
+  const verification_standard = req.body.verification_standard
+    ? req.body.verification_standard
     : "";
-  const methodology = req.body.p ? req.body.p.methodology : "";
-  const credit_volume = req.body.p ? req.body.p.credit_volume : "";
-  const price_per_credit = req.body.p ? req.body.p.price_per_credit : "";
-  const expiry_date = req.body.p ? req.body.p.expiry_date : "";
+  const methodology = req.body.methodology ? req.body.methodology : "";
+  const credit_volume = req.body.credit_volume ? req.body.credit_volume : "";
+  const price_per_credit = req.body.price_per_credit
+    ? req.body.price_per_credit
+    : "";
+  const expiry_date = req.body.expiry_date ? req.body.expiry_date : "";
 
-  const city = req.body.location ? req.body.location.city : "";
-  const stateProvince = req.body.location
-    ? req.body.location.state_province
-    : "";
-  const country = req.body.location ? req.body.location.country : "";
+  const city = req.body.city ? req.body.city : "";
+  const stateProvince = req.body.state_province ? req.body.state_province : "";
+  const country = req.body.country ? req.body.country : "";
 
   let subset = marketPostRef;
-
-  // const queryArray = [];
 
   if (post_type !== "") {
     subset = subset.where("post_type", "==", post_type);
@@ -116,7 +114,7 @@ exports.queryMarketPost = async (req, res) => {
   }
 
   if (expiry_date !== "") {
-    subset = subset.where("expiry_date", "<=", expiry_date);
+    subset = subset.where("p.expiry_date", "<=", expiry_date);
   }
 
   if (city !== "") {
@@ -130,13 +128,6 @@ exports.queryMarketPost = async (req, res) => {
   if (country !== "") {
     subset = subset.where("location.country", "==", country);
   }
-
-  // if (queryArray.length > 0) {
-  //   const queryRefs = queryArray.map((query) => query.get());
-  //   const queryDocs = await Promise.all(queryRefs);
-  //   const docIds = queryDocs.map((doc) => doc.id);
-  //   subset = subset.where(db.FieldPath.documentId(), "in", docIds);
-  // }
 
   const snapshot = await subset.get();
 
