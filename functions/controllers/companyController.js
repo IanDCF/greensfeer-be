@@ -56,7 +56,19 @@ exports.registerCompany = (req, res) => {
 };
 // GET: list of companies from company collection
 exports.allCompanies = (req, res) => {
-  companyRef.get().then(console.log(snapshot));
+  companyRef
+    .get()
+    .then((snapshot) => {
+      const companies = [];
+      snapshot.forEach((doc) => {
+        companies.push(doc.data());
+      });
+      return res.status(200).send(companies);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send(`error: ${err}`);
+    });
 };
 
 // GET: single company details
