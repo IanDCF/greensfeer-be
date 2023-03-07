@@ -34,9 +34,6 @@ app.use(cors(corsOptions));
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-// Company Route
-app.use("/api/company", companyRoute);
-
 // Home Route
 app.get("/", (req, res) => {
   return res.status(200).send("Greensfeer Backend");
@@ -47,6 +44,9 @@ app.use("/api/user", userRoute);
 
 // Market Post Route
 app.use("/api/market_post", marketPostRoute);
+
+// Company Route
+app.use("/api/company", companyRoute);
 
 // Export API to Firebase Cloud Functions
 exports.app = functions.https.onRequest(app);
