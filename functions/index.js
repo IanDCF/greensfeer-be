@@ -37,6 +37,9 @@ app.use(express.json());
 // User Route
 app.use("/api/user", userRoute);
 
+// Market Post Route
+app.use("/api/market_post", marketPostRoute);
+
 // Affiliation Route
 app.use("/api/affiliation", affiliationRoute);
 
@@ -44,12 +47,6 @@ app.use("/api/affiliation", affiliationRoute);
 app.get("/", (req, res) => {
   return res.status(200).send("Greensfeer Backend");
 });
-
-// User Route
-app.use("/api/user", userRoute);
-
-// Market Post Route
-app.use("/api/market_post", marketPostRoute);
 
 // Export API to Firebase Cloud Functions
 exports.app = functions.https.onRequest(app);
