@@ -19,9 +19,10 @@ initializeApp({
 
 /*--- import routes after initializing app ---*/
 // location of routing important; don't require route before app is initialized
-const userRoute = require("./routes/userRoute");
+// const userRoute = require("./routes/userRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
 const marketPostRoute = require("./routes/marketPostRoute");
+const companyRoute = require("./routes/companyRoute");
 
 const corsOptions = {
   origin: true,
@@ -47,6 +48,9 @@ app.use("/api/affiliation", affiliationRoute);
 app.get("/", (req, res) => {
   return res.status(200).send("Greensfeer Backend");
 });
+
+// Company Route
+app.use("/api/company", companyRoute);
 
 // Export API to Firebase Cloud Functions
 exports.app = functions.https.onRequest(app);
