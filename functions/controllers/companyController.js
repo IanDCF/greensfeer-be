@@ -1,4 +1,3 @@
-const admin = require("firebase-admin");
 const { v4: uuidv4 } = require("uuid");
 const {
   getFirestore,
@@ -25,7 +24,7 @@ exports.registerCompany = (req, res) => {
   } = req.body;
   const company_id = uuidv4();
   const created_at = new Date().toISOString();
-
+  //handle creation
   companyRef
     .doc(`${company_id}`)
     .set({
@@ -44,16 +43,18 @@ exports.registerCompany = (req, res) => {
     })
     .then(() => {
       console.log(`company created: ${company_id}`);
-      return res.status(200).send(`company created: ${company_id}`);
+      return res.status(200).send({
+        status: 200,
+        message: `company created: ${company_id}`,
+      });
     })
     .catch((err) => {
+      //handle error
       console.log(err);
       return res.status(500).send(err);
     });
-
-  //handle error
-  //handle creation
 };
+
 // GET: list of companies from company collection
 exports.allCompanies = (_req, res) => {
   companyRef
@@ -95,23 +96,23 @@ exports.singleCompany = (req, res) => {
 // PATCH: single company details
 exports.updateCompany = (req, res) => {
   const updateObject = req.body;
-  const companyId = req.params.id;
+  const company_id = req.params.id;
   companyRef
-    .doc(companyId)
+    .doc(company_id)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        const companyRef = db.collection("company").doc(companyId);
+        const companyRef = db.collection("company").doc(company_id);
         return companyRef.update(updateObject);
       } else {
         return res.status(404).send({ error: "Company not found" });
       }
     })
     .then(() => {
-      console.log(`Company: ${companyId} has been updated`);
+      console.log(`Company: ${company_id} has been updated`);
       return res.status(200).send({
         status: 200,
-        message: `Company: ${companyId} has been updated`,
+        message: `Company: ${company_id} has been updated`,
       });
     })
     .catch((err) => {
