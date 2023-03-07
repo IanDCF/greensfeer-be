@@ -1,9 +1,10 @@
+const router = require("express").Router();
 const requestController = require("../controllers/requestController");
 
-router.route("/");
 router
   .route("/:user_id")
   .post(requestController.newRequest)
   .get(requestController.getRequests)
-  .delete(requestController.deleteUserAffiliation);
+  .patch(requestController.handleRequest)
+  .delete(requestController.deleteRequest);
 module.exports = router;
