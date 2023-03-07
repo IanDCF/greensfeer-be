@@ -1,3 +1,4 @@
+const { v4: uuidv4 } = require("uuid");
 const {
   getFirestore,
   Timestamp,
@@ -8,20 +9,19 @@ const db = getFirestore();
 
 const affiliationRef = db.collection("affiliation");
 
-// POST: new user doc in 'affiliation' collection
+// POST: new affiliation doc in 'affiliation' collection
 exports.newUserAffiliation = (req, res) => {
+  const affiliation_id = uuidv4();
   const user_id = req.body.user_id;
   const company_id = req.body.company_id;
   const affObject = {
-    [user_id]: {
-      user_id,
-      company_id,
-      admin: req.body.admin,
-      posting: req.body.posting,
-    },
+    user_id,
+    company_id,
+    admin: req.body.admin,
+    posting: req.body.posting,
   };
   affiliationRef
-    .doc(`${company_id}`)
+    .doc(`${affiliation_id}`)
     .set(affObject)
     .then(() => {
       return res.status(201).send({
@@ -35,21 +35,56 @@ exports.newUserAffiliation = (req, res) => {
     });
 };
 
-exports.getUserAffiliations = (req, res) => {
-  const user_id = req.body.user_id;
-  const query = db.collection("affiliation").where(`${user_id}`, "!=", null);
+// GET: all affiliated companies of a single user
+exports.getUserAffiliations = async (req, res) => {
+  const user_id = req.params.user_id ?? "";
 
-  query
-    .get()
-    .then((querySnapshot) => {
-      const result = [];
-      querySnapshot.forEach((doc) => {
-        result.push(doc.data());
-      });
-      return res.status(201).send(result);
-    })
-    .catch((error) => {
-      console.error(error);
-      return res.status(500).send({ status: 500, error: `${error}` });
+  const subset = affiliationRef.where("user_id", "==", user_id);
+
+  const snapshot = await subset.get();
+
+  if (snapshot.size === 0) {
+    console.log(`No affiliations found for user: ${user_id}`);
+    return res.status(404).send({
+      status: 404,
+      error: `No affiliations found for user: ${user_id}`,
     });
+  }
+
+  const result = snapshot.docs.map((doc) => doc.data());
+
+  return res.status(302).send(result);
+};
+
+// DELETE: a single affiliation doc
+exports.deleteUserAffiliation = async (req, res) => {
+  const user_id = req.params.user_id ?? "";
+  const company_id = req.body.company_id ?? "";
+
+  const subset = affiliationRef
+    .where("user_id", "==", user_id)
+    .where("company_id", "==", company_id);
+
+  const snapshot = await subset.get();
+
+  if (snapshot.size === 0) {
+    console.log(
+      `No affiliation found for user ${user_id} and company ${company_id}`
+    );
+    return res.status(404).send({
+      status: 404,
+      error: `No affiliation found for user ${user_id} and company ${company_id}`,
+    });
+  }
+
+  const doc = snapshot.docs[0];
+  await doc.ref.delete();
+
+  console.log(
+    `Successfully deleted affiliation for user ${user_id} and company ${company_id}`
+  );
+  return res.status(204).send({
+    status: 204,
+    message: `Successfully deleted affiliation for user ${user_id} and company ${company_id}`,
+  });
 };

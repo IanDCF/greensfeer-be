@@ -1,11 +1,9 @@
 const { v4: uuidv4 } = require("uuid");
-
 const {
   getFirestore,
   Timestamp,
   FieldValue,
 } = require("firebase-admin/firestore");
-const { query } = require("express");
 const db = getFirestore();
 
 const marketPostRef = db.collection("market_post");

@@ -36,10 +36,13 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
 // User Route
-app.use("/api/user", userRoute);
+// app.use("/api/user", userRoute);
 
 // Market Post Route
 app.use("/api/market_post", marketPostRoute);
+
+// Company Route
+app.use("/api/company", companyRoute);
 
 // Affiliation Route
 app.use("/api/affiliation", affiliationRoute);
@@ -48,9 +51,6 @@ app.use("/api/affiliation", affiliationRoute);
 app.get("/", (req, res) => {
   return res.status(200).send("Greensfeer Backend");
 });
-
-// Company Route
-app.use("/api/company", companyRoute);
 
 // Export API to Firebase Cloud Functions
 exports.app = functions.https.onRequest(app);
