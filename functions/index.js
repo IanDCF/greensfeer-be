@@ -19,8 +19,9 @@ initializeApp({
 
 /*--- import routes after initializing app ---*/
 // location of routing important; don't require route before app is initialized
-const userRoute = require("./routes/userRoute");
+// const userRoute = require("./routes/userRoute");
 const marketPostRoute = require("./routes/marketPostRoute");
+const companyRoute = require("./routes/companyRoute");
 
 const corsOptions = {
   origin: true,
@@ -43,6 +44,9 @@ app.use("/api/user", userRoute);
 
 // Market Post Route
 app.use("/api/market_post", marketPostRoute);
+
+// Company Route
+app.use("/api/company", companyRoute);
 
 // Export API to Firebase Cloud Functions
 exports.app = functions.https.onRequest(app);
