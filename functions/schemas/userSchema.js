@@ -21,14 +21,3 @@ exports.createUserSchema = baseUserSchema
 exports.updateUserSchema = baseUserSchema
 
 
-// exports.singleUserSchema = z.object({
-//     id: z.string()
-// })
-
-// exports.updateUserSchema = z.object({
-//     //Add needed variables
-// })
-
-// exports.deleteUserSchema = z.object({
-//     id: z.string()
-// })

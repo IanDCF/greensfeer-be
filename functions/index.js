@@ -19,7 +19,10 @@ initializeApp({
 
 /*--- import routes after initializing app ---*/
 // location of routing important; don't require route before app is initialized
-const userRoute = require("./routes/userRoute");
+// const userRoute = require("./routes/userRoute");
+const affiliationRoute = require("./routes/affiliationRoute");
+const marketPostRoute = require("./routes/marketPostRoute");
+const companyRoute = require("./routes/companyRoute");
 
 const corsOptions = {
   origin: true,
@@ -33,7 +36,16 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
 // User Route
-app.use("/api/user", userRoute);
+// app.use("/api/user", userRoute);
+
+// Market Post Route
+app.use("/api/market_post", marketPostRoute);
+
+// Company Route
+app.use("/api/company", companyRoute);
+
+// Affiliation Route
+app.use("/api/affiliation", affiliationRoute);
 
 // Home Route
 app.get("/", (req, res) => {
