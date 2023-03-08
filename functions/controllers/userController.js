@@ -5,19 +5,45 @@ const {
   FieldValue,
 } = require("firebase-admin/firestore");
 const db = getFirestore();
-const { userSchema } = require('../schemas/userSchema')
-
+const { createUserSchema, updateUserSchema } = require("../schemas/userSchema");
+const buildUserBody = (reqBody) => {
+  const {
+    first_name,
+    last_name,
+    email,
+    profile_picture,
+    profile_banner,
+    headline,
+    linkedin,
+    city,
+    state_province,
+    country,
+    about,
+    created_at,
+  } = reqBody;
+  const userLocation = {
+    city: city || null,
+    state_province: state_province || null,
+    country: country || null,
+  };
+  return {
+    first_name: first_name,
+    last_name: last_name,
+    email: email,
+    profile_picture: profile_picture || null,
+    profile_banner: profile_banner || null,
+    headline: headline || null,
+    linkedin: linkedin || null,
+    location: userLocation,
+    about: about || null,
+    created_at: created_at || null,
+  };
+}
 // Authentication: register new user
 // POST: create new user document in 'user' collection
-exports.registerUser = (req, res) => {
-  const userBody = {
-    first_name: req.body.first_name,
-    last_name: req.body.last_name,
-    email: req.body.email,
-    created_at: new Date().toISOString(),
-  };
-  const user = userSchema.safeParse(userBody)
-
+exports.createUser = (req, res) => {
+  const userBody = buildUserBody(req.body)
+  const user = createUserSchema.safeParse(userBody);
   if (!user.success) {
     return res.status(400).send(user.error.errors);
   }
@@ -27,7 +53,9 @@ exports.registerUser = (req, res) => {
     .then((userRecord) => {
       console.log(userRecord);
       const uid = userRecord.uid;
-      db.collection("user").doc(`${uid}`).set(user);
+      db.collection("user")
+        .doc(`${uid}`)
+        .set({ ...user.data, uid });
       return uid;
     })
     .then((uid) => {
@@ -40,27 +68,6 @@ exports.registerUser = (req, res) => {
         return res.status(400).send(error);
       }
       return res.status(500).send(error);
-    });
-};
-
-// Authentication: return user custom id token on login
-exports.loginUser = (req, res) => {
-  const email = req.body.email;
-  const password = req.body.password;
-
-  admin
-    .auth()
-    .getUserByEmail(email)
-    .then((userRecord) => {
-      const uid = userRecord.uid;
-      return admin.auth().createCustomToken(uid);
-    })
-    .then((customToken) => {
-      res.send({ customToken });
-    })
-    .catch((error) => {
-      console.error(`Error logging in: ${error}`);
-      res.status(401).send("Invalid email or password");
     });
 };
 
@@ -100,7 +107,11 @@ exports.allUsers = async (req, res) => {
 
 // PATCH: update single user document with id
 exports.updateUser = (req, res) => {
-  const updateObject = req.body;
+  const userBody = buildUserBody(req.body)
+  const updateObject = updateUserSchema(userBody)
+  if (!user.success) {
+    return res.status(400).send(user.error.errors);
+  }
   db.collection("user")
     .doc(req.params.id)
     .get()
