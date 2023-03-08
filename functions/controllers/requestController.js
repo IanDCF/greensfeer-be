@@ -9,6 +9,9 @@ const db = getFirestore();
 
 const requestRef = db.collection("request");
 
+// Import services
+const { deleteRequest } = require("../services/deleteRequest");
+
 // POST new connection request
 exports.newRequest = (req, res) => {
   const request_id = uuidv4();
@@ -62,9 +65,9 @@ exports.getRequests = async (req, res) => {
 };
 
 // PATCH connection request: accept & POST new connection, decline & delete request
-exports.handleRequest = async (req, res) => {
+exports.handleRequest = (req, res, next) => {
   //populate addressee_id from current user via token/auth
-  const { addressee_id, request_id, status } = await req.body;
+  const { addressee_id, request_id, status } = req.body;
   console.log(status);
   requestRef
     .doc(request_id)
@@ -80,7 +83,13 @@ exports.handleRequest = async (req, res) => {
         return res.status(200).send(`updated`);
       }
       if (status === "decline") {
-        return res.status(200).send(`call service to delete request`);
+        deleteRequest(request_id)
+          .then(() => {
+            res.status(201).send(`request ${request_id} deleted`);
+          })
+          .then(() => {
+            next();
+          });
       }
       if (status === "pending") {
         return res.status(404).send({ error: "invalid connection request" });
@@ -88,34 +97,28 @@ exports.handleRequest = async (req, res) => {
     })
     .then(() => {
       //call service to update connections
-      debugger;
       console.log(`call service to update connections`);
       return;
     })
     .catch((err) => {
       console.error(err);
-      debugger;
       return res.status(500).send({ error: "Server error" });
     });
 };
 
 // DELETE **once completed move this to a service
-exports.deleteRequest = async (req, res) => {
-  const { request_id, addressee_id } = req.body;
+exports.deleteRequest = (req, res, next) => {
+  //do I need next parameter?
+  const { request_id } = req.body;
   //problem with syntax in here; how to structure to confirm doc exists & addressee matches before deleting?
-  requestRef
-    .doc(request_id)
-    .then((doc) => {
-      const requestRecord = doc.data();
-      if (doc.exists && addressee_id === requestRecord.addressee_id) {
-        console.log(`${requestRecord} found, deleting`);
-      }
-    })
-    .delete()
+  deleteRequest(request_id)
     .then(() => {
-      return res.status(200).send({
-        status: 200,
-        message: `Request ${request_id} deleted`,
-      });
+      res.sendStatus(201);
+    })
+    .then(() => {
+      next();
+    })
+    .catch((e) => {
+      res.status(500).send(`${e} controller catch`);
     });
 };
