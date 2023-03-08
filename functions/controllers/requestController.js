@@ -62,9 +62,10 @@ exports.getRequests = async (req, res) => {
 };
 
 // PATCH connection request: accept & POST new connection, decline & delete request
-exports.handleRequest = (req, res) => {
+exports.handleRequest = async (req, res) => {
   //populate addressee_id from current user via token/auth
-  const { addressee_id, request_id, status } = req.body;
+  const { addressee_id, request_id, status } = await req.body;
+  console.log(status);
   if (status === "accept") {
     requestRef
       .doc(request_id)
@@ -73,20 +74,36 @@ exports.handleRequest = (req, res) => {
         const requestRecord = doc.data();
         if (doc.exists && addressee_id === requestRecord.addressee_id) {
           return requestRef.doc(request_id).update({ status: status });
+        } else {
+          return res.status(404).send({ error: "invalid connection request" });
         }
       })
-      .then(
+      .then(() => {
         //call service to update connections
-        console.log(`call service to update connections`)
-      );
+        return console.log(`call service to update connections`);
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(500).send({ error: "Server error" });
+      });
   }
   if (status === "decline") {
     requestRef
       .doc(request_id)
       .get()
       .then((doc) => {
-        console.log(`call service to delete request`);
+        return console.log(`call service to delete request`);
+      })
+      .catch((err) => {
+        console.error(err);
+        return res.status(500).send({ error: "Server error" });
       });
+  }
+  if (status === "pending") {
+    console.log(req.body);
+    res.send({
+      error: "Invalid update",
+    });
   }
 };
 
