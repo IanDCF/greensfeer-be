@@ -66,49 +66,41 @@ exports.handleRequest = async (req, res) => {
   //populate addressee_id from current user via token/auth
   const { addressee_id, request_id, status } = await req.body;
   console.log(status);
-  if (status === "accept") {
-    requestRef
-      .doc(request_id)
-      .get()
-      .then((doc) => {
-        const requestRecord = doc.data();
-        if (doc.exists && addressee_id === requestRecord.addressee_id) {
-          return requestRef.doc(request_id).update({ status: status });
-        } else {
-          return res.status(404).send({ error: "invalid connection request" });
-        }
-      })
-      .then(() => {
-        //call service to update connections
-        return console.log(`call service to update connections`);
-      })
-      .catch((err) => {
-        console.error(err);
-        return res.status(500).send({ error: "Server error" });
-      });
-  }
-  if (status === "decline") {
-    requestRef
-      .doc(request_id)
-      .get()
-      .then((doc) => {
-        return console.log(`call service to delete request`);
-      })
-      .catch((err) => {
-        console.error(err);
-        return res.status(500).send({ error: "Server error" });
-      });
-  }
-  if (status === "pending") {
-    console.log(req.body);
-    res.send({
-      error: "Invalid update",
+  requestRef
+    .doc(request_id)
+    .get()
+    .then((doc) => {
+      const requestRecord = doc.data();
+      if (
+        status === "accept" &&
+        doc.exists &&
+        addressee_id === requestRecord.addressee_id
+      ) {
+        requestRef.doc(request_id).update({ status: status });
+        return res.status(200).send(`updated`);
+      }
+      if (status === "decline") {
+        return res.status(200).send(`call service to delete request`);
+      }
+      if (status === "pending") {
+        return res.status(404).send({ error: "invalid connection request" });
+      }
+    })
+    .then(() => {
+      //call service to update connections
+      debugger;
+      console.log(`call service to update connections`);
+      return;
+    })
+    .catch((err) => {
+      console.error(err);
+      debugger;
+      return res.status(500).send({ error: "Server error" });
     });
-  }
 };
 
 // DELETE **once completed move this to a service
-exports.deleteRequest = (req, res) => {
+exports.deleteRequest = async (req, res) => {
   const { request_id, addressee_id } = req.body;
   //problem with syntax in here; how to structure to confirm doc exists & addressee matches before deleting?
   requestRef
