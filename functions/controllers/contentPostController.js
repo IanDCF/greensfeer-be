@@ -4,6 +4,7 @@ const {
   Timestamp,
   FieldValue,
 } = require("firebase-admin/firestore");
+const { getConnections } = require("../services/getConnections");
 
 const db = getFirestore();
 
@@ -11,20 +12,29 @@ const contentPostRef = db.collection("content_post");
 
 // POST: create new contentPost doc in 'contentPost' collection
 exports.newContentPost = (req, res) => {
-  const contentPost_id = uuidv4();
-  const user1_id = req.body.user1_id;
-  const user2_id = req.body.user2_id;
+  const content_post_id = uuidv4();
+  const author_id = req.body.user_id;
+  const image = req.body.image || null;
+  const video = req.body.video || null;
+  const document = req.body.document || null;
+  const body = req.body.body;
+
   const contentPostObj = {
-    members: [user1_id, user2_id],
+    author_id,
+    image,
+    video,
+    document,
+    body,
+    likes: 0,
     created_at: new Date().toISOString(),
   };
   contentPostRef
-    .doc(`${contentPost_id}`)
+    .doc(`${content_post_id}`)
     .set(contentPostObj)
     .then(() => {
       return res.status(201).send({
         status: 201,
-        message: `User: ${user1_id} is now a contentPost of user: ${user2_id}`,
+        message: `User: ${author_id} successfully shared a post`,
       });
     })
     .catch((error) => {
@@ -34,29 +44,33 @@ exports.newContentPost = (req, res) => {
 };
 
 // GET: all contentPosts of a single user
-exports.getUserContentPosts = (req, res) => {
+exports.getUserLiveFeed = async (req, res) => {
   const user_id = req.params.user_id;
   const contentPosts = [];
 
-  // Query the database for all contentPosts that involve the user
-  contentPostRef
-    .where("members", "array-contains", user_id)
-    .get()
-    .then((snapshot) => {
-      // Loop through each contentPost and add the user's contentPost id to the array
-      snapshot.forEach((doc) => {
-        const contentPost = doc.data().members;
-        const contentPostId = doc.id;
-        const usercontentPostId = contentPost.filter((id) => id !== user_id)[0];
-        contentPosts.push(usercontentPostId);
-      });
-      // Return the array of user's contentPost ids
-      return res.status(200).send(contentPosts);
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).send({ error: "Server error" });
+  try {
+    // Call getConnections service to retrieve array with user ids of all connections
+    const userConnections = await getConnections(user_id);
+
+    // Query the database for all contentPosts where the author_id matches any userConnection id
+    const snapshot = await contentPostRef
+      .where("author_id", "in", userConnections)
+      .get();
+
+    // Loop through each contentPost and add it to the array if its author_id is in the userConnections array
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      if (userConnections.includes(data.author_id)) {
+        contentPosts.push(data);
+      }
     });
+
+    // Return the array of content posts
+    return res.status(200).send(contentPosts);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: "Server error" });
+  }
 };
 
 // DELETE: a single contentPost doc by passing contentPost document id
