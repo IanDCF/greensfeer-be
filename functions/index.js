@@ -24,7 +24,11 @@ const marketPostRoute = require("./routes/marketPostRoute");
 const companyRoute = require("./routes/companyRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
 const connectionRoute = require("./routes/connectionRoute");
+<<<<<<< HEAD
 const requestRoute = require("./routes/requestRoute");
+=======
+const contentPostRoute = require("./routes/contentPostRoute");
+>>>>>>> 93c2ef179e9a909fefbb15f021405b18dc1837d3
 
 const corsOptions = {
   origin: true,
@@ -52,8 +56,13 @@ app.use("/api/affiliation", affiliationRoute);
 // Connection Route
 app.use("/api/connection", connectionRoute);
 
+<<<<<<< HEAD
 // Request Route
 app.use("/api/request", requestRoute);
+=======
+// Content Post Route
+app.use("/api/content_post", contentPostRoute);
+>>>>>>> 93c2ef179e9a909fefbb15f021405b18dc1837d3
 
 // Home Route
 app.get("/", (req, res) => {
