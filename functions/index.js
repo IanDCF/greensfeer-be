@@ -24,6 +24,7 @@ const marketPostRoute = require("./routes/marketPostRoute");
 const companyRoute = require("./routes/companyRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
 const connectionRoute = require("./routes/connectionRoute");
+const requestRoute = require("./routes/requestRoute");
 const contentPostRoute = require("./routes/contentPostRoute");
 
 const corsOptions = {
@@ -51,6 +52,9 @@ app.use("/api/affiliation", affiliationRoute);
 
 // Connection Route
 app.use("/api/connection", connectionRoute);
+
+// Request Route
+app.use("/api/request", requestRoute);
 
 // Content Post Route
 app.use("/api/content_post", contentPostRoute);
