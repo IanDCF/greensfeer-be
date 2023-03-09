@@ -11,13 +11,16 @@ const requestRef = db.collection("request");
 
 // Import services
 const { deleteRequest } = require("../services/deleteRequest");
+const { createConnection } = require("../services/createConnection");
 
 // POST new connection request
 exports.newRequest = (req, res) => {
   const request_id = uuidv4();
-  const requester_id = req.params.user_id;
+  const addressee_id = req.params.addressee_id;
   //this assumes all user ids are sent to the front end, is there security risk in having ids in the browser?
-  const addressee_id = req.body.addressee_id;
+  // This is a good point.. is there a way to handle ids in the front end such that they are encoded,
+  // and then we decode them in the backend?
+  const requester_id = req.body.requester_id;
   const body = req.body.body;
   const status = "pending";
   const created_at = new Date().toISOString();
@@ -37,7 +40,7 @@ exports.newRequest = (req, res) => {
     .then(() => {
       return res.status(201).send({
         status: 201,
-        message: `connection request sent by ${requester_id}`,
+        message: `Connection request sent to ${addressee_id}`,
       });
     });
 };
@@ -67,7 +70,8 @@ exports.getRequests = async (req, res) => {
 // PATCH connection request: accept & POST new connection, decline & delete request
 exports.handleRequest = (req, res, next) => {
   //populate addressee_id from current user via token/auth
-  const { addressee_id, request_id, status } = req.body;
+  const request_id = req.params.request_id;
+  const { addressee_id, status, requester_id } = req.body;
   console.log(status);
   requestRef
     .doc(request_id)
@@ -80,29 +84,25 @@ exports.handleRequest = (req, res, next) => {
         addressee_id === requestRecord.addressee_id
       ) {
         requestRef.doc(request_id).update({ status: status });
-        return res.status(200).send(`updated`);
-      }
-      if (status === "decline") {
-        deleteRequest(request_id)
-          .then(() => {
-            res.status(201).send(`request ${request_id} deleted`);
-          })
-          .then(() => {
-            next();
-          });
-      }
-      if (status === "pending") {
-        return res.status(404).send({ error: "invalid connection request" });
-      }
-    })
-    .then(() => {
-      //call service to update connections
-      console.log(`call service to update connections`);
-      return;
+        createConnection(addressee_id, requester_id);
+        return res
+          .status(200)
+          .send(
+            `User: ${addressee_id} is now a connection of member: ${requestRecord.requester_id} `
+          );
+      } else if (status === "decline") {
+        deleteRequest(request_id).then(() => {
+          return res
+            .status(201)
+            .send({ status: 201, message: `request ${request_id} deleted` });
+        });
+      } else if (status === "pending") {
+        return res.status(404).send({ error: "Invalid connection request" });
+      } else return res.status(404).send({ error: "Bad Request" });
     })
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ error: "Server error" });
+      return res.status(500).send({ error: `Server error: ${err}` });
     });
 };
 
@@ -111,6 +111,7 @@ exports.deleteRequest = (req, res, next) => {
   //do I need next parameter?
   const { request_id } = req.body;
   //problem with syntax in here; how to structure to confirm doc exists & addressee matches before deleting?
+  // with a query is my guess. we could use the same structure as with market posts queries
   deleteRequest(request_id)
     .then(() => {
       res.sendStatus(201);
