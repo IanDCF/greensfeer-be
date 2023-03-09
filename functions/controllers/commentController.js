@@ -11,9 +11,17 @@ exports.getPostComments = (req, res) => {
 
 // POST: new comment associated with content_post_id
 exports.newComment = (req, res) => {
-  console.log(req.body);
+  const { author_id, text } = req.body;
+  post_id = req.params.content_post_id;
+  created_at = new Date().toISOString();
+  console.log(req.body, post_id, created_at);
 };
 
 // PATCH: **Future feature: update a certain comment by comment_id
-
+exports.updateComment = (req, res) => {
+  console.log("future feature");
+};
 // DELETE: **Future feature: delete a certain comment by comment_id
+exports.deleteComment = (req, res) => {
+  console.log("future feature");
+};
