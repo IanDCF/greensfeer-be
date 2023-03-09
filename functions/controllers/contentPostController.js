@@ -20,6 +20,7 @@ exports.newContentPost = (req, res) => {
   const body = req.body.body;
 
   const contentPostObj = {
+    content_post_id,
     author_id,
     image,
     video,
@@ -43,7 +44,7 @@ exports.newContentPost = (req, res) => {
     });
 };
 
-// GET: all contentPosts of a single user
+// GET: all content posts of a user's connections
 exports.getUserLiveFeed = async (req, res) => {
   const user_id = req.params.user_id;
   const contentPosts = [];
@@ -73,19 +74,97 @@ exports.getUserLiveFeed = async (req, res) => {
   }
 };
 
-// DELETE: a single contentPost doc by passing contentPost document id
-exports.deleteContentPost = (req, res) => {
-  const doc_id = req.params.doc_id;
+// GET: all content posts in db
+exports.getContentPosts = (req, res) => {
+  contentPostRef
+    .get()
+    .then((snapshot) => {
+      const contentPosts = [];
+      snapshot.forEach((doc) => {
+        contentPosts.push(doc.data());
+      });
+      return res.status(200).send(contentPosts);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ error: "Server error" });
+    });
+};
+
+// PATCH: a single content post doc by passing doc id in params
+exports.editContentPost = (req, res) => {
+  const doc_id = req.params.post_id;
+  const author_id = req.body.user_id;
+  const image = req.body.image || null;
+  const video = req.body.video || null;
+  const document = req.body.document || null;
+  const body = req.body.body;
+
+  const updateObj = {
+    image,
+    video,
+    document,
+    body,
+  };
 
   contentPostRef
     .doc(doc_id)
-    .delete()
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        return res.status(404).send({ error: "Document not found" });
+      }
+      const data = doc.data();
+      if (data.author_id !== author_id) {
+        return res.status(403).send({ error: "Unauthorized to edit document" });
+      }
+      return contentPostRef.doc(doc_id).update(updateObj);
+    })
     .then(() => {
-      console.log(`Document: ${doc_id} deleted successfully`);
+      console.log(`Document: ${doc_id} updated successfully`);
       return res.status(200).send({
         status: 200,
-        message: `Document: ${doc_id} deleted successfully`,
+        message: `Document: ${doc_id} updated successfully`,
       });
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ error: "Server error" });
+    });
+};
+
+exports.deleteContentPost = (req, res) => {
+  const doc_id = req.params.post_id;
+  const author_id = req.body.user_id;
+
+  contentPostRef
+    .doc(doc_id)
+    .get()
+    .then((doc) => {
+      if (!doc.exists) {
+        return res.status(404).send({
+          error: "Content post not found",
+        });
+      }
+
+      const data = doc.data();
+
+      if (data.author_id !== author_id) {
+        return res.status(403).send({
+          error: "Unauthorized to delete content post",
+        });
+      }
+
+      return contentPostRef
+        .doc(doc_id)
+        .delete()
+        .then(() => {
+          console.log(`Document: ${doc_id} deleted successfully`);
+          return res.status(200).send({
+            status: 200,
+            message: `Document: ${doc_id} deleted successfully`,
+          });
+        });
     })
     .catch((err) => {
       console.error(err);
