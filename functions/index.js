@@ -24,6 +24,7 @@ const marketPostRoute = require("./routes/marketPostRoute");
 const companyRoute = require("./routes/companyRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
 const connectionRoute = require("./routes/connectionRoute");
+const contentPostRoute = require("./routes/contentPostRoute");
 
 const corsOptions = {
   origin: true,
@@ -50,6 +51,9 @@ app.use("/api/affiliation", affiliationRoute);
 
 // Connection Route
 app.use("/api/connection", connectionRoute);
+
+// Content Post Route
+app.use("/api/content_post", contentPostRoute);
 
 // Home Route
 app.get("/", (req, res) => {
