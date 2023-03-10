@@ -19,7 +19,7 @@ initializeApp({
 
 /*--- import routes after initializing app ---*/
 // location of routing important; don't require route before app is initialized
-// const userRoute = require("./routes/userRoute");
+const userRoute = require("./routes/userRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
 const marketPostRoute = require("./routes/marketPostRoute");
 const companyRoute = require("./routes/companyRoute");
@@ -36,7 +36,7 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
 // User Route
-// app.use("/api/user", userRoute);
+app.use("/api/user", userRoute);
 
 // Market Post Route
 app.use("/api/market_post", marketPostRoute);

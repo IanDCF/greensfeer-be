@@ -17,7 +17,7 @@ exports.baseUserSchema = z.object({
     about: string().trim().optional().nullable(),
     created_at: string().trim().optional().nullable()
 });
-exports.createUserSchema = baseUserSchema
-exports.updateUserSchema = baseUserSchema
+exports.createUserSchema = exports.baseUserSchema
+exports.updateUserSchema = exports.baseUserSchema
 
 
