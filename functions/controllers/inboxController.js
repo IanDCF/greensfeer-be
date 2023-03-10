@@ -29,10 +29,27 @@ exports.getChats = async (req, res) => {
 
 // DELETE certain user's conversation
 exports.deleteChat = (req, res) => {
-  console.log(`single doc tied to doc id & user id`);
+  const conversation_id = req.params.conversation_id;
+  inboxRef
+    .doc(conversation_id)
+    .delete()
+    .then(() => {
+      return res.status(201).send({
+        status: 201,
+        message: `conversation ${conversation_id} deleted`,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).send({
+        status: 500,
+        message: err,
+      });
+    });
 };
 
 // POST create a new conversation tied to user_id & recipient_id
 exports.newChat = (req, res) => {
   console.log(`service will set new doc`);
 };
+
+// Future services associated with inbox: PATCH: update seen & updated at when there is a GET to messages associated with conversation
