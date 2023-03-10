@@ -38,6 +38,7 @@ app.use(express.json());
 
 // User Route
 app.use("/api/user", userRoute);
+app.use("/api/user", userRoute);
 
 // Market Post Route
 app.use("/api/market_post", marketPostRoute);
