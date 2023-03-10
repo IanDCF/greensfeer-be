@@ -44,7 +44,6 @@ exports.newMessage = (req, res) => {
     .doc(message_id)
     .set(messageObj)
     .then(() => {
-      // Call service to create new conversation document
       return res.status(201).send({
         status: 201,
         message: `Message: ${message_id} sent on conversation: ${conversation_id}`,
