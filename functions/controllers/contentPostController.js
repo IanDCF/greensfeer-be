@@ -26,7 +26,7 @@ exports.newContentPost = (req, res) => {
     video,
     document,
     body,
-    likes: 0,
+    likes: [],
     created_at: new Date().toISOString(),
   };
   contentPostRef
