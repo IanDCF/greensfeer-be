@@ -23,6 +23,8 @@ const userRoute = require("./routes/userRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
 const marketPostRoute = require("./routes/marketPostRoute");
 const companyRoute = require("./routes/companyRoute");
+const affiliationRoute = require("./routes/affiliationRoute");
+const connectionRoute = require("./routes/connectionRoute");
 
 const corsOptions = {
   origin: true,
@@ -37,6 +39,7 @@ app.use(express.json());
 
 // User Route
 app.use("/api/user", userRoute);
+app.use("/api/user", userRoute);
 
 // Market Post Route
 app.use("/api/market_post", marketPostRoute);
@@ -46,6 +49,9 @@ app.use("/api/company", companyRoute);
 
 // Affiliation Route
 app.use("/api/affiliation", affiliationRoute);
+
+// Connection Route
+app.use("/api/connection", connectionRoute);
 
 // Home Route
 app.get("/", (req, res) => {
