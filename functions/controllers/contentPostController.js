@@ -91,7 +91,23 @@ exports.getContentPosts = (req, res) => {
     });
 };
 
-// PATCH: a single content post doc by passing doc id in params
+// GET: all content posts of a single user
+exports.getUserContentPosts = (req, res) => {
+  const author_id = req.params.user_id;
+  contentPostRef
+    .where("author_id", "==", author_id)
+    .get()
+    .then((snapshot) => {
+      const contentPosts = snapshot.docs.map((doc) => doc.data());
+      return res.status(200).send(contentPosts);
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ error: "Server error" });
+    });
+};
+
+// PATCH: a single content post doc by passing content_post_id in params
 exports.editContentPost = (req, res) => {
   const doc_id = req.params.post_id;
   const author_id = req.body.user_id;
@@ -133,6 +149,47 @@ exports.editContentPost = (req, res) => {
     });
 };
 
+// PATCH: update likes of content post
+exports.likeContentPost = (req, res) => {
+  const doc_id = req.params.post_id;
+  const user_id = req.body.user_id;
+
+  contentPostRef
+    .doc(doc_id)
+    .get()
+    .then((doc) => {
+      if (doc.exists) {
+        const data = doc.data();
+        const likes = data.likes || [];
+
+        if (!likes.includes(user_id)) {
+          likes.push(user_id);
+
+          contentPostRef
+            .doc(doc_id)
+            .update({ likes: likes })
+            .then(() => {
+              return res.status(200).send({ status: 200, likes: likes.length });
+            })
+            .catch((err) => {
+              console.error(err);
+              return res.status(500).send({ error: "Server error" });
+            });
+        } else {
+          return res.status(400).send({ error: "User already liked the post" });
+        }
+      } else {
+        return res.status(404).send({ error: "Post not found" });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      return res.status(500).send({ error: "Server error" });
+    });
+};
+
+// DELETE: a single content post by passing content_post_id in params
+// ensures that actor is authorized to delete
 exports.deleteContentPost = (req, res) => {
   const doc_id = req.params.post_id;
   const author_id = req.body.user_id;
