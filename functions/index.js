@@ -20,7 +20,6 @@ initializeApp({
 /*--- import routes after initializing app ---*/
 // location of routing important; don't require route before app is initialized
 const userRoute = require("./routes/userRoute");
-const affiliationRoute = require("./routes/affiliationRoute");
 const marketPostRoute = require("./routes/marketPostRoute");
 const companyRoute = require("./routes/companyRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
