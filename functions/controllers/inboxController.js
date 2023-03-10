@@ -49,6 +49,7 @@ exports.deleteChat = (req, res) => {
 
 // POST create a new conversation tied to user_id & recipient_id
 exports.newChat = (req, res) => {
+  // request structure: req.params.user_id = sender (members [0]), req.body.recipient = addressee (members [1]), conversation_id UUID, created_at, updated_at = time, seen = false
   console.log(`service will set new doc`);
 };
 
