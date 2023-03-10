@@ -49,7 +49,24 @@ exports.deleteChat = (req, res) => {
 
 // POST create a new conversation tied to user_id & recipient_id
 exports.newChat = (req, res) => {
-  // request structure: req.params.user_id = sender (members [0]), req.body.recipient = addressee (members [1]), conversation_id UUID, created_at, updated_at = time, seen = false
+  // request structure: req.params.user_id = sender (members [0]), req.body.addressee = addressee (members [1]), conversation_id UUID, created_at, updated_at = time, seen = false
+  const member0 = req.params.user_id;
+  const member1 = req.body.addressee;
+  const conversation_id = uuidv4();
+  const time = new Date().toISOString;
+  const seen = false;
+
+  const conversationObj = {
+    conversation_id,
+    created_at: time,
+    members: [member0, member1],
+    seen,
+    updated_at: time,
+  };
+
+  if (checkUser(member0) && checkUser(member1)) {
+    inboxRef.doc(conversation_id).set;
+  }
   console.log(`service will set new doc`);
 };
 
