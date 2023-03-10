@@ -4,6 +4,7 @@ const {
   Timestamp,
   FieldValue,
 } = require("firebase-admin/firestore");
+const { getConnections } = require("../services/getConnections");
 
 const db = getFirestore();
 
@@ -34,29 +35,15 @@ exports.newConnection = (req, res) => {
 };
 
 // GET: all connections of a single user
-exports.getUserConnections = (req, res) => {
+exports.getUserConnections = async (req, res) => {
   const user_id = req.params.user_id;
-  const connections = [];
-
-  // Query the database for all connections that involve the user
-  connectionRef
-    .where("members", "array-contains", user_id)
-    .get()
-    .then((snapshot) => {
-      // Loop through each connection and add the user's connection id to the array
-      snapshot.forEach((doc) => {
-        const connection = doc.data().members;
-        const connectionId = doc.id;
-        const userConnectionId = connection.filter((id) => id !== user_id)[0];
-        connections.push(userConnectionId);
-      });
-      // Return the array of user's connection ids
-      return res.status(200).send(connections);
-    })
-    .catch((err) => {
-      console.error(err);
-      return res.status(500).send({ error: "Server error" });
-    });
+  try {
+    const connections = await getConnections(user_id);
+    return res.status(200).send(connections);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: "Server error" });
+  }
 };
 
 // DELETE: a single connection doc by passing connection document id
