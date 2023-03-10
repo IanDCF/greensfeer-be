@@ -28,6 +28,7 @@ const requestRoute = require("./routes/requestRoute");
 const contentPostRoute = require("./routes/contentPostRoute");
 const commentRoute = require("./routes/commentRoute");
 const messageRoute = require("./routes/messageRoute");
+const inboxRoute = require("./routes/inboxRoute");
 
 const corsOptions = {
   origin: true,
@@ -63,8 +64,12 @@ app.use("/api/content_post", contentPostRoute);
 
 // Comment Route
 app.use("/api/comment", commentRoute);
+
 // Content Post Route
 app.use("/api/content_post", contentPostRoute);
+
+// Message Route
+app.use("/api/message", messageRoute);
 
 // Inbox Route
 app.use("/api/inbox", inboxRoute);
