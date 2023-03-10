@@ -26,6 +26,7 @@ const affiliationRoute = require("./routes/affiliationRoute");
 const connectionRoute = require("./routes/connectionRoute");
 const requestRoute = require("./routes/requestRoute");
 const commentRoute = require("./routes/commentRoute");
+const messageRoute = require("./routes/messageRoute");
 
 const corsOptions = {
   origin: true,
@@ -58,6 +59,9 @@ app.use("/api/request", requestRoute);
 
 // Comment Route
 app.use("/api/comment", commentRoute);
+
+// Message Route
+app.use("/api/message", messageRoute);
 
 // Home Route
 app.get("/", (req, res) => {
