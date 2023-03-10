@@ -25,7 +25,7 @@ exports.getMessages = async (req, res) => {
   }
 };
 
-// POST: new message associated with conversation_id
+// POST: new message associated with one conversation_id from params
 exports.newMessage = (req, res) => {
   const message_id = uuidv4();
   conversation_id = req.params.conversation_id;
@@ -44,6 +44,7 @@ exports.newMessage = (req, res) => {
     .doc(message_id)
     .set(messageObj)
     .then(() => {
+      // Call service to create new conversation document
       return res.status(201).send({
         status: 201,
         message: `Message: ${message_id} sent on conversation: ${conversation_id}`,
@@ -55,11 +56,43 @@ exports.newMessage = (req, res) => {
     });
 };
 
-// PATCH: **Future feature: update a certain message by message_id
+// PATCH: update a message by message_id in params
 exports.editMessage = (req, res) => {
-  console.log("future feature");
+  const message_id = req.params.message_id;
+  const { text } = req.body;
+
+  messageRef
+    .doc(message_id)
+    .update({
+      text: text,
+    })
+    .then(() => {
+      return res.status(200).send({
+        status: 200,
+        message: `Message: ${message_id} has been updated`,
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      return res.status(500).send({ status: 500, error: `${error}` });
+    });
 };
-// DELETE: **Future feature: delete a certain message by message_id
+
+// DELETE: message by message_id in params
 exports.deleteMessage = (req, res) => {
-  console.log("future feature");
+  const message_id = req.params.message_id;
+
+  messageRef
+    .doc(message_id)
+    .delete()
+    .then(() => {
+      return res.status(204).send({
+        status: 204,
+        message: `Message: ${message_id} has been deleted`,
+      });
+    })
+    .catch((error) => {
+      console.error(error);
+      return res.status(500).send({ status: 500, error: `${error}` });
+    });
 };
