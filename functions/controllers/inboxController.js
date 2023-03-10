@@ -6,9 +6,7 @@ const db = getFirestore();
 const inboxRef = db.collection("conversation");
 
 // Import Services
-const { createConversation } = require("../services/createConversation");
 const { checkUser } = require("../services/checkUser");
-// const { getConnections } = require("../services/getConnections");
 
 // GET all documents in conversation where doc includes user_id
 exports.getChats = async (req, res) => {
@@ -48,12 +46,12 @@ exports.deleteChat = (req, res) => {
 };
 
 // POST create a new conversation tied to user_id & recipient_id
-exports.newChat = (req, res) => {
+exports.newChat = async (req, res) => {
   // request structure: req.params.user_id = sender (members [0]), req.body.addressee = addressee (members [1]), conversation_id UUID, created_at, updated_at = time, seen = false
-  const member0 = req.params.user_id;
-  const member1 = req.body.addressee;
+  const member0 = await req.params.user_id;
+  const member1 = await req.body.addressee;
   const conversation_id = uuidv4();
-  const time = new Date().toISOString;
+  const time = new Date().toISOString();
   const seen = false;
 
   const conversationObj = {
@@ -63,11 +61,28 @@ exports.newChat = (req, res) => {
     seen,
     updated_at: time,
   };
-
-  if (checkUser(member0) && checkUser(member1)) {
-    inboxRef.doc(conversation_id).set;
-  }
-  console.log(`service will set new doc`);
+  console.log(conversationObj);
+  //   if (checkUser(member0) && checkUser(member1)) {
+  inboxRef
+    .doc(conversation_id)
+    .set(conversationObj)
+    .then(() => {
+      return res.status(201).send({
+        status: 201,
+        message: `Conversation created between ${member0} & ${member1}`,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).send({
+        status: 500,
+        message: err,
+      });
+    });
+  //   }
+  //   return res.status(404).send({
+  //     status: 404,
+  //     message: `Require two valid users to create conversation`,
+  //   });
 };
 
 // Future services associated with inbox: PATCH: update seen & updated at when there is a GET to messages associated with conversation
