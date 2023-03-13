@@ -12,13 +12,16 @@ const affiliationRef = db.collection("affiliation");
 // POST: new affiliation doc in 'affiliation' collection
 exports.newUserAffiliation = (req, res) => {
   const affiliation_id = uuidv4();
-  const user_id = req.body.user_id;
-  const company_id = req.body.company_id;
+  const { user_id, company_id, admin, posting } = req.body;
+
+  const created_at = new Date().toISOString();
   const affObject = {
+    affiliation_id,
     user_id,
     company_id,
-    admin: req.body.admin,
-    posting: req.body.posting,
+    admin,
+    posting,
+    created_at,
   };
   affiliationRef
     .doc(`${affiliation_id}`)
