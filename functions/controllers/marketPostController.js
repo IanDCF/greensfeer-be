@@ -23,7 +23,7 @@ exports.newMarketPost = (req, res) => {
   const link = req.body.link;
   const location = req.body;
   const contact = req.body.contact;
-  const created_at = req.body.created_at;
+  const created_at = new Date().toISOString();
 
   const market_post_id = uuidv4();
   marketPostRef
@@ -182,9 +182,9 @@ exports.allCompanyMarketPosts = (req, res) => {
 
 // GET: a single market post
 exports.getMarketPost = (req, res) => {
-  const marketPostId = req.params.market_post_id;
+  const market_post_id = req.params.market_post_id;
   marketPostRef
-    .doc(marketPostId)
+    .doc(market_post_id)
     .get()
     .then((doc) => {
       if (doc.exists) {
@@ -202,23 +202,23 @@ exports.getMarketPost = (req, res) => {
 // PATCH: a single market post's details
 exports.updateMarketPost = (req, res) => {
   const updateObject = req.body;
-  const marketPostId = req.params.market_post_id;
+  const market_post_id = req.params.market_post_id;
   marketPostRef
-    .doc(marketPostId)
+    .doc(market_post_id)
     .get()
     .then((doc) => {
       if (doc.exists) {
-        const marketPostRef = db.collection("market_post").doc(marketPostId);
+        const marketPostRef = db.collection("market_post").doc(market_post_id);
         return marketPostRef.update(updateObject);
       } else {
         return res.status(404).send({ error: "Market Post not found" });
       }
     })
     .then(() => {
-      console.log(`Market Post: ${marketPostId} has been updated`);
+      console.log(`Market Post: ${market_post_id} has been updated`);
       return res.status(200).send({
         status: 200,
-        message: `Market Post: ${marketPostId} has been updated`,
+        message: `Market Post: ${market_post_id} has been updated`,
       });
     })
     .catch((err) => {
@@ -229,15 +229,15 @@ exports.updateMarketPost = (req, res) => {
 
 // DELETE: a single post
 exports.deleteMarketPost = (req, res) => {
-  const marketPostId = req.params.market_post_id;
+  const market_post_id = req.params.market_post_id;
   marketPostRef
-    .doc(`${marketPostId}`)
+    .doc(`${market_post_id}`)
     .delete()
     .then(() => {
-      console.log(`Market Post: ${marketPostId} has been deleted`);
+      console.log(`Market Post: ${market_post_id} has been deleted`);
       return res.status(200).send({
         status: 200,
-        message: `Market Post: ${marketPostId} has been deleted`,
+        message: `Market Post: ${market_post_id} has been deleted`,
       });
     })
     .catch((err) => {
