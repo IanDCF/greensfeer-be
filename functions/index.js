@@ -17,18 +17,18 @@ initializeApp({
   credential: cert(serviceAccount),
 });
 
-/*--- import routes after initializing app ---*/
+/*--- Import Routes from router files ---*/
 // location of routing important; don't require route before app is initialized
 // const userRoute = require("./routes/userRoute");
-const marketPostRoute = require("./routes/marketPostRoute");
-const companyRoute = require("./routes/companyRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
-const connectionRoute = require("./routes/connectionRoute");
-const requestRoute = require("./routes/requestRoute");
-const contentPostRoute = require("./routes/contentPostRoute");
 const commentRoute = require("./routes/commentRoute");
-const messageRoute = require("./routes/messageRoute");
+const companyRoute = require("./routes/companyRoute");
+const connectionRoute = require("./routes/connectionRoute");
+const contentPostRoute = require("./routes/contentPostRoute");
 const inboxRoute = require("./routes/inboxRoute");
+const marketPostRoute = require("./routes/marketPostRoute");
+const messageRoute = require("./routes/messageRoute");
+const requestRoute = require("./routes/requestRoute");
 
 const corsOptions = {
   origin: true,
@@ -41,38 +41,17 @@ app.use(cors(corsOptions));
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-// User Route
+/*--- Register Router Middleware ---*/
 // app.use("/api/user", userRoute);
-
-// Market Post Route
-app.use("/api/market_post", marketPostRoute);
-
-// Company Route
-app.use("/api/company", companyRoute);
-
-// Affiliation Route
 app.use("/api/affiliation", affiliationRoute);
-
-// Connection Route
-app.use("/api/connection", connectionRoute);
-
-// Request Route
-app.use("/api/request", requestRoute);
-
-// Content Post Route
-app.use("/api/content_post", contentPostRoute);
-
-// Comment Route
 app.use("/api/comment", commentRoute);
-
-// Content Post Route
+app.use("/api/company", companyRoute);
+app.use("/api/connection", connectionRoute);
 app.use("/api/content_post", contentPostRoute);
-
-// Message Route
-app.use("/api/message", messageRoute);
-
-// Inbox Route
 app.use("/api/inbox", inboxRoute);
+app.use("/api/market_post", marketPostRoute);
+app.use("/api/message", messageRoute);
+app.use("/api/request", requestRoute);
 
 // Home Route
 app.get("/", (req, res) => {
