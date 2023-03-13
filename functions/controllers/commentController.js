@@ -26,14 +26,15 @@ exports.newComment = (req, res) => {
   const comment_id = uuidv4();
   content_post_id = req.params.content_post_id;
   const { author_id, text } = req.body;
-  created_at = new Date().toISOString();
+  timestamp = new Date().toISOString();
 
   const commentObj = {
     comment_id,
     content_post_id,
     author_id,
     text,
-    created_at,
+    created_at: timestamp,
+    updated_at: timestamp,
   };
 
   commentRef
