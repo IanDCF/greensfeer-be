@@ -3,7 +3,7 @@ const { getFirestore } = require("firebase-admin/firestore");
 
 const db = getFirestore();
 
-const inboxRef = db.collection("conversation");
+const inboxRef = db.collection("inbox");
 
 // Import Services
 const { checkUser } = require("../services/checkUser");
@@ -11,17 +11,17 @@ const { checkUser } = require("../services/checkUser");
 // GET all documents in conversation where doc includes user_id
 exports.getChats = async (req, res) => {
   const user_id = req.params.user_id;
-  const chats = await inboxRef
+  const conversations = await inboxRef
     .where("members", "array-contains", user_id)
     .get();
-  if (chats.empty) {
+  if (conversations.empty) {
     console.log(`No conversations for ${user_id}`);
     return res.status(204).send({
       status: 204,
       message: `No conversations for ${user_id}`,
     });
   }
-  const result = chats.docs.map((doc) => doc.data());
+  const result = conversations.docs.map((doc) => doc.data());
   return res.status(200).send(result);
 };
 
@@ -48,8 +48,8 @@ exports.deleteChat = (req, res) => {
 // POST create a new conversation tied to user_id & recipient_id
 exports.newChat = async (req, res) => {
   // request structure: req.params.user_id = sender (members [0]), req.body.addressee = addressee (members [1]), conversation_id UUID, created_at, updated_at = time, seen = false
-  const member0 = await req.params.user_id;
-  const member1 = await req.body.addressee;
+  const member0 = await req.params.member0;
+  const member1 = await req.body.member1;
   const conversation_id = uuidv4();
   const time = new Date().toISOString();
   const seen = false;
