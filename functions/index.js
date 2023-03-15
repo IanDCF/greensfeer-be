@@ -29,6 +29,7 @@ const contentPostRoute = require("./routes/contentPostRoute");
 const commentRoute = require("./routes/commentRoute");
 const messageRoute = require("./routes/messageRoute");
 const inboxRoute = require("./routes/inboxRoute");
+const notificationRoute = require("./routes/notificationRoute");
 
 const corsOptions = {
   origin: true,
@@ -73,6 +74,9 @@ app.use("/api/message", messageRoute);
 
 // Inbox Route
 app.use("/api/inbox", inboxRoute);
+
+// Notification Route
+app.use("/api/notification", notificationRoute);
 
 // Home Route
 app.get("/", (req, res) => {

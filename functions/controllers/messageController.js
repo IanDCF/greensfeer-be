@@ -1,5 +1,6 @@
 const { v4: uuidv4 } = require("uuid");
 const { getFirestore, Timestamp } = require("firebase-admin/firestore");
+const { sendNotification } = require("../services/sendNotifiaction");
 const db = getFirestore();
 
 const messageRef = db.collection("message");
@@ -29,7 +30,7 @@ exports.getMessages = async (req, res) => {
 exports.newMessage = (req, res) => {
   const message_id = uuidv4();
   conversation_id = req.params.conversation_id;
-  const { sender_id, text } = req.body;
+  const { sender_id, receiver_id, text } = req.body;
   created_at = new Date().toISOString();
 
   const messageObj = {
@@ -40,10 +41,20 @@ exports.newMessage = (req, res) => {
     created_at,
   };
 
+  const notificationObj = {
+    owner_id: receiver_id,
+    actor_id: sender_id,
+    notification_type: "New Message",
+    notification_content: text || `Wants to chat with you`,
+    delivered: false,
+    link: `path/to/messages/page`,
+  };
+
   messageRef
     .doc(message_id)
     .set(messageObj)
     .then(() => {
+      sendNotification(notificationObj);
       return res.status(201).send({
         status: 201,
         message: `Message: ${message_id} sent on conversation: ${conversation_id}`,

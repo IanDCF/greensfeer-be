@@ -12,6 +12,7 @@ const requestRef = db.collection("request");
 // Import services
 const { deleteRequest } = require("../services/deleteRequest");
 const { createConnection } = require("../services/createConnection");
+const { sendNotification } = require("../services/sendNotifiaction");
 
 // POST new connection request
 exports.newRequest = (req, res) => {
@@ -21,7 +22,7 @@ exports.newRequest = (req, res) => {
   // This is a good point.. is there a way to handle ids in the front end such that they are encoded,
   // and then we decode them in the backend?
   const requester_id = req.body.requester_id;
-  const body = req.body.body;
+  const body = req.body.body || null;
   const status = "pending";
   const created_at = new Date().toISOString();
 
@@ -34,10 +35,20 @@ exports.newRequest = (req, res) => {
     created_at,
   };
 
+  const notificationObj = {
+    owner_id: addressee_id,
+    actor_id: requester_id,
+    notification_type: "New Connection Request",
+    notification_content: body || `Would like to connect with you`,
+    delivered: false,
+    link: `path/to/network/page`,
+  };
+
   requestRef
     .doc(request_id)
     .set(requestObj)
     .then(() => {
+      sendNotification(notificationObj);
       return res.status(201).send({
         status: 201,
         message: `Connection request sent to ${addressee_id}`,
@@ -73,6 +84,14 @@ exports.handleRequest = (req, res, next) => {
   const request_id = req.params.request_id;
   const { addressee_id, status, requester_id } = req.body;
   console.log(status);
+  const notificationObj = {
+    owner_id: requester_id,
+    actor_id: addressee_id,
+    notification_type: `Connection Request Accepted`,
+    notification_content: `Is now a connection`,
+    delivered: false,
+    link: `path/to/connection/profile`,
+  };
   requestRef
     .doc(request_id)
     .get()
@@ -85,6 +104,7 @@ exports.handleRequest = (req, res, next) => {
       ) {
         requestRef.doc(request_id).update({ status: status });
         createConnection(addressee_id, requester_id);
+        sendNotification(notificationObj);
         return res
           .status(200)
           .send(
