@@ -28,18 +28,18 @@ exports.registerCompany = (req, res) => {
   companyRef
     .doc(`${company_id}`)
     .set({
-      company_id,
-      name,
-      email,
-      website,
-      logo,
       banner,
+      company_id,
+      created_at,
+      description,
+      email,
+      location,
+      logo,
       headline,
       market_role,
-      location,
+      name,
       sector,
-      description,
-      created_at,
+      website,
     })
     .then(() => {
       console.log(`company created: ${company_id}`);

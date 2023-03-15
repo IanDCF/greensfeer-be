@@ -6,13 +6,15 @@ const commentRef = db.collection("comment");
 
 // GET: all comments for particular content_post_id
 exports.getPostComments = async (req, res) => {
-  post_id = req.params.content_post_id;
-  const snapshot = await commentRef.where("post_id", "==", post_id).get();
+  content_post_id = req.params.content_post_id;
+  const snapshot = await commentRef
+    .where("content_post_id", "==", content_post_id)
+    .get();
   if (snapshot.empty) {
-    console.log(`no comments on post ${post_id}`);
+    console.log(`no comments on post ${content_post_id}`);
     return res.status(204).send({
       status: 204,
-      message: `no comments on post ${post_id}`,
+      message: `no comments on post ${content_post_id}`,
     });
   }
   const result = snapshot.docs.map((doc) => doc.data());
@@ -22,16 +24,17 @@ exports.getPostComments = async (req, res) => {
 // POST: new comment associated with content_post_id
 exports.newComment = (req, res) => {
   const comment_id = uuidv4();
-  post_id = req.params.content_post_id;
+  content_post_id = req.params.content_post_id;
   const { author_id, text } = req.body;
-  created_at = new Date().toISOString();
+  timestamp = new Date().toISOString();
 
   const commentObj = {
     comment_id,
-    post_id,
+    content_post_id,
     author_id,
     text,
-    created_at,
+    created_at: timestamp,
+    updated_at: timestamp,
   };
 
   commentRef
@@ -40,7 +43,7 @@ exports.newComment = (req, res) => {
     .then(() => {
       return res.status(201).send({
         status: 201,
-        message: `comment ${comment_id} created on ${post_id}`,
+        message: `comment ${comment_id} created on ${content_post_id}`,
       });
     })
     .catch((error) => {

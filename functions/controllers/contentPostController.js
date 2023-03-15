@@ -13,7 +13,7 @@ const contentPostRef = db.collection("content_post");
 // POST: create new contentPost doc in 'contentPost' collection
 exports.newContentPost = (req, res) => {
   const content_post_id = uuidv4();
-  const author_id = req.body.user_id;
+  const author_id = req.body.author_id;
   const image = req.body.image || null;
   const video = req.body.video || null;
   const document = req.body.document || null;
@@ -93,7 +93,7 @@ exports.getContentPosts = (req, res) => {
 
 // GET: all content posts of a single user
 exports.getUserContentPosts = (req, res) => {
-  const author_id = req.params.user_id;
+  const author_id = req.params.author_id;
   contentPostRef
     .where("author_id", "==", author_id)
     .get()
@@ -110,7 +110,7 @@ exports.getUserContentPosts = (req, res) => {
 // PATCH: a single content post doc by passing content_post_id in params
 exports.editContentPost = (req, res) => {
   const doc_id = req.params.post_id;
-  const author_id = req.body.user_id;
+  const author_id = req.body.author_id;
   const image = req.body.image || null;
   const video = req.body.video || null;
   const document = req.body.document || null;
@@ -192,7 +192,7 @@ exports.likeContentPost = (req, res) => {
 // ensures that actor is authorized to delete
 exports.deleteContentPost = (req, res) => {
   const doc_id = req.params.post_id;
-  const author_id = req.body.user_id;
+  const author_id = req.body.author_id;
 
   contentPostRef
     .doc(doc_id)
