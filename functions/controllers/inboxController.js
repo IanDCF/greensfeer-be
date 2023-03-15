@@ -62,6 +62,18 @@ exports.newChat = async (req, res) => {
     updated_at: time,
   };
   console.log(conversationObj);
+  const checkExisting = inboxRef
+    .where("members", "array-contains", member0)
+    .where("members", "array-contains", member1)
+    .get();
+
+  if (checkExisting.exists) {
+    console.log(
+      "cannot query firestrore via multiple array-contains, need to restructure data or skip this validation"
+    );
+    return;
+  }
+
   //   if (checkUser(member0) && checkUser(member1)) {
   inboxRef
     .doc(conversation_id)

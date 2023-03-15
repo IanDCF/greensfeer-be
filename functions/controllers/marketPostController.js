@@ -20,7 +20,7 @@ exports.newMarketPost = (req, res) => {
   const post_type = req.body.post_type;
   const post_category = req.body.post_category;
   const description = req.body.description;
-  const p = req.body.p;
+  const p = req.body.p || null;
   const link = req.body.link;
   const location = req.body;
   const contact = req.body.contact;
