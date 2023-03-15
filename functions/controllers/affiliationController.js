@@ -12,13 +12,16 @@ const affiliationRef = db.collection("affiliation");
 // POST: new affiliation doc in 'affiliation' collection
 exports.newUserAffiliation = (req, res) => {
   const affiliation_id = uuidv4();
-  const user_id = req.body.user_id;
-  const company_id = req.body.company_id;
+  const { user_id, company_id, admin, posting } = req.body;
+
+  const created_at = new Date().toISOString();
   const affObject = {
+    affiliation_id,
     user_id,
     company_id,
-    admin: req.body.admin,
-    posting: req.body.posting,
+    admin,
+    posting,
+    created_at,
   };
   affiliationRef
     .doc(`${affiliation_id}`)
@@ -66,6 +69,7 @@ exports.deleteUserAffiliation = async (req, res) => {
     .where("company_id", "==", company_id);
 
   const snapshot = await subset.get();
+  console.log(`${user_id} \n ${company_id}`);
 
   if (snapshot.size === 0) {
     console.log(
@@ -78,13 +82,21 @@ exports.deleteUserAffiliation = async (req, res) => {
   }
 
   const doc = snapshot.docs[0];
-  await doc.ref.delete();
-
-  console.log(
-    `Successfully deleted affiliation for user ${user_id} and company ${company_id}`
-  );
-  return res.status(204).send({
-    status: 204,
-    message: `Successfully deleted affiliation for user ${user_id} and company ${company_id}`,
-  });
+  doc.ref
+    .delete()
+    .then(() => {
+      console.log(
+        `Successfully deleted affiliation for user ${user_id} and company ${company_id}`
+      );
+      return res.status(204).send({
+        status: 204,
+        message: `Successfully deleted affiliation for user ${user_id} and company ${company_id}`,
+      });
+    })
+    .catch((err) => {
+      return res.status(500).send({
+        status: 500,
+        message: err,
+      });
+    });
 };

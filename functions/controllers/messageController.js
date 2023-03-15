@@ -2,6 +2,7 @@ const { v4: uuidv4 } = require("uuid");
 const { getFirestore, Timestamp } = require("firebase-admin/firestore");
 const { sendNotification } = require("../services/sendNotifiaction");
 const db = getFirestore();
+const { userInConvo } = require("../services/userInConvo");
 
 const messageRef = db.collection("message");
 
@@ -27,7 +28,7 @@ exports.getMessages = async (req, res) => {
 };
 
 // POST: new message associated with one conversation_id from params
-exports.newMessage = (req, res) => {
+exports.newMessage = async (req, res) => {
   const message_id = uuidv4();
   conversation_id = req.params.conversation_id;
   const { sender_id, receiver_id, text } = req.body;
@@ -40,6 +41,12 @@ exports.newMessage = (req, res) => {
     text,
     created_at,
   };
+  if (!(await userInConvo(conversation_id, sender_id))) {
+    return res.status(404).send({
+      status: 404,
+      message: `no coversation found to match sender ${sender_id}`,
+    });
+  }
 
   const notificationObj = {
     owner_id: receiver_id,

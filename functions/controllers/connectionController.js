@@ -16,6 +16,7 @@ exports.newConnection = (req, res) => {
   const user1_id = req.body.user1_id;
   const user2_id = req.body.user2_id;
   const connectionObj = {
+    connection_id,
     members: [user1_id, user2_id],
     created_at: new Date().toISOString(),
   };
@@ -48,16 +49,16 @@ exports.getUserConnections = async (req, res) => {
 
 // DELETE: a single connection doc by passing connection document id
 exports.deleteConnection = (req, res) => {
-  const doc_id = req.params.doc_id;
+  const connection_id = req.params.connection_id;
 
   connectionRef
-    .doc(doc_id)
+    .doc(connection_id)
     .delete()
     .then(() => {
-      console.log(`Document: ${doc_id} deleted successfully`);
+      console.log(`Document: ${connection_id} deleted successfully`);
       return res.status(200).send({
         status: 200,
-        message: `Document: ${doc_id} deleted successfully`,
+        message: `Document: ${connection_id} deleted successfully`,
       });
     })
     .catch((err) => {
