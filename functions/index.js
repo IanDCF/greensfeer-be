@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const { getAuth } = require("firebase-admin/auth");
 
 const {
   initializeApp,
@@ -57,7 +58,26 @@ app.use("/api/notification", notificationRoute);
 
 // Home Route
 app.get("/", (req, res) => {
+  console.log(req.body);
+  console.log(req.headers);
+  getAuth()
+    .verifyIdToken(idToken)
+    .then((decodedToken) => {
+      console.log(decodedToken);
+    });
   return res.status(200).send("Greensfeer Backend");
+});
+
+app.post("/", (req, res) => {
+  token = req.body.token;
+  // console.log(req.body.token);
+  getAuth()
+    .verifyIdToken(token)
+    .then((decodedToken) => {
+      const uid = decodedToken.uid;
+      return console.log(uid);
+      //implement as service, user sends token with each request, check for uid match
+    });
 });
 
 // Export API to Firebase Cloud Functions
