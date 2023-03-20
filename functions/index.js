@@ -20,7 +20,7 @@ initializeApp({
 
 /*--- Import Routes from router files ---*/
 // location of routing important; don't require route before app is initialized
-// const userRoute = require("./routes/userRoute");
+const userRoute = require("./routes/userRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
 const commentRoute = require("./routes/commentRoute");
 const companyRoute = require("./routes/companyRoute");
@@ -44,7 +44,7 @@ app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
 /*--- Register Router Middleware ---*/
-// app.use("/api/user", userRoute);
+app.use("/api/user", userRoute);
 app.use("/api/affiliation", affiliationRoute);
 app.use("/api/comment", commentRoute);
 app.use("/api/company", companyRoute);
