@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const { getAuth } = require("firebase-admin/auth");
 
 const {
   initializeApp,
@@ -17,44 +18,72 @@ initializeApp({
   credential: cert(serviceAccount),
 });
 
-/*--- import routes after initializing app ---*/
+/*--- Import Routes from router files ---*/
 // location of routing important; don't require route before app is initialized
 const userRoute = require("./routes/userRoute");
-const marketPostRoute = require("./routes/marketPostRoute");
-const companyRoute = require("./routes/companyRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
+const commentRoute = require("./routes/commentRoute");
+const companyRoute = require("./routes/companyRoute");
 const connectionRoute = require("./routes/connectionRoute");
+const contentPostRoute = require("./routes/contentPostRoute");
+const inboxRoute = require("./routes/inboxRoute");
+const marketPostRoute = require("./routes/marketPostRoute");
+const messageRoute = require("./routes/messageRoute");
+const requestRoute = require("./routes/requestRoute");
+const notificationRoute = require("./routes/notificationRoute");
 
 const corsOptions = {
   origin: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true,
+  optionSuccessStatus: 200,
+  allowedHeaders: "Accept",
 };
 
 // Middleware
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
-// User Route
+/*--- Register Router Middleware ---*/
 app.use("/api/user", userRoute);
-app.use("/api/user", userRoute);
-
-// Market Post Route
-app.use("/api/market_post", marketPostRoute);
-
-// Company Route
-app.use("/api/company", companyRoute);
-
-// Affiliation Route
 app.use("/api/affiliation", affiliationRoute);
-
-// Connection Route
+app.use("/api/comment", commentRoute);
+app.use("/api/company", companyRoute);
 app.use("/api/connection", connectionRoute);
+app.use("/api/content_post", contentPostRoute);
+app.use("/api/inbox", inboxRoute);
+app.use("/api/market_post", marketPostRoute);
+app.use("/api/message", messageRoute);
+app.use("/api/request", requestRoute);
+app.use("/api/notification", notificationRoute);
 
 // Home Route
 app.get("/", (req, res) => {
+  console.log(req.body);
+  console.log(req.headers);
+  getAuth()
+    .verifyIdToken(idToken)
+    .then((decodedToken) => {
+      console.log(decodedToken);
+    });
   return res.status(200).send("Greensfeer Backend");
+});
+
+app.post("/", (req, res) => {
+  token = req.body.token;
+  // console.log(req.body.token);
+  if (token) {
+    getAuth()
+      .verifyIdToken(token)
+      .then((decodedToken) => {
+        const uid = decodedToken.uid;
+        return console.log(uid);
+        //implement as service, user sends token with each request, check for uid match
+      });
+  }
+  console.log(req.body);
+  return res.send("success");
 });
 
 // Export API to Firebase Cloud Functions

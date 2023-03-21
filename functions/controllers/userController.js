@@ -4,6 +4,7 @@ const {
   Timestamp,
   FieldValue,
 } = require("firebase-admin/firestore");
+const { getAuth } = require("firebase-admin/auth");
 const db = getFirestore();
 const { createUserSchema, updateUserSchema } = require("../schemas/userSchema");
 const buildUserBody = (reqBody) => {
@@ -38,11 +39,43 @@ const buildUserBody = (reqBody) => {
     about: about || null,
     created_at: created_at || null,
   };
-}
+};
+// const { checkUser } = require("../services/checkUser");
+const { decodeToken } = require("../services/decodeToken");
+
 // Authentication: register new user
+// POST: create a database entry for user opon front end sign up
+// req from client AuthProvider signUp function, line 28
+exports.entryForSignUp = (req, res) => {
+  idToken = req.body.idToken;
+
+  getAuth()
+    .verifyIdToken(idToken)
+    .then((decoded) => {
+      return decoded.uid;
+    })
+    .then((uid) => {
+      db.collection("user")
+        .doc(`${uid}`)
+        .set({ uid: `${uid}` })
+        .then((time) => {
+          return res.status(201).send({
+            status: 201,
+            message: `user ${uid} created at ${time}`,
+          });
+        });
+    })
+    .catch((error) => {
+      res.status(500).send({
+        status: 500,
+        message: `error: ${error}`,
+      });
+    });
+};
+
 // POST: create new user document in 'user' collection
 exports.createUser = (req, res) => {
-  const userBody = buildUserBody(req.body)
+  const userBody = buildUserBody(req.body);
   const user = createUserSchema.safeParse(userBody);
   if (!user.success) {
     return res.status(400).send(user.error.errors);
@@ -107,8 +140,8 @@ exports.allUsers = async (req, res) => {
 
 // PATCH: update single user document with id
 exports.updateUser = (req, res) => {
-  const userBody = buildUserBody(req.body)
-  const updateObject = updateUserSchema(userBody)
+  const userBody = buildUserBody(req.body);
+  const updateObject = updateUserSchema(userBody);
   if (!user.success) {
     return res.status(400).send(user.error.errors);
   }

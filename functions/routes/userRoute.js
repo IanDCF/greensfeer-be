@@ -8,5 +8,6 @@ router
   .get(userController.singleUser)
   .patch(userController.updateUser)
   .delete(userController.deleteUser);
+router.route("/signUp").post(userController.entryForSignUp);
 
 module.exports = router;
