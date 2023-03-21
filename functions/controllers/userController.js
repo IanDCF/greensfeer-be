@@ -140,8 +140,21 @@ exports.allUsers = async (req, res) => {
 
 // GET: active user signed in on front-end
 exports.currentUser = (req, res) => {
-  console.log(req.headers);
-  res.status(200);
+  const user = {
+    first_name: "John",
+    last_name: "Doe",
+    headline: "Software Engineer",
+    location: {
+      city: "San Francisco",
+      state_province: "California",
+      country: "United States",
+    },
+    profile_picture: "https://example.com/profile-picture.jpg",
+    profile_banner: "https://example.com/profile-banner.jpg",
+    about: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+  };
+  res.set("Access-Control-Allow-Origin", "http://127.0.0.1:5173");
+  res.status(200).json(user);
 };
 
 // PATCH: update single user document with id
