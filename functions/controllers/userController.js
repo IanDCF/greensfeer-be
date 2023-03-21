@@ -138,6 +138,12 @@ exports.allUsers = async (req, res) => {
   }
 };
 
+// GET: active user signed in on front-end
+exports.currentUser = (req, res) => {
+  console.log(req.headers);
+  res.status(200);
+};
+
 // PATCH: update single user document with id
 exports.updateUser = (req, res) => {
   const userBody = buildUserBody(req.body);
