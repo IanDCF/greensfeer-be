@@ -36,10 +36,12 @@ const corsOptions = {
   origin: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true,
+  optionSuccessStatus: 200,
+  allowedHeaders: "Accept",
 };
 
 // Middleware
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
@@ -71,13 +73,17 @@ app.get("/", (req, res) => {
 app.post("/", (req, res) => {
   token = req.body.token;
   // console.log(req.body.token);
-  getAuth()
-    .verifyIdToken(token)
-    .then((decodedToken) => {
-      const uid = decodedToken.uid;
-      return console.log(uid);
-      //implement as service, user sends token with each request, check for uid match
-    });
+  if (token) {
+    getAuth()
+      .verifyIdToken(token)
+      .then((decodedToken) => {
+        const uid = decodedToken.uid;
+        return console.log(uid);
+        //implement as service, user sends token with each request, check for uid match
+      });
+  }
+  console.log(req.body);
+  return res.send("success");
 });
 
 // Export API to Firebase Cloud Functions
