@@ -139,8 +139,8 @@ exports.allUsers = async (req, res) => {
 };
 
 // GET: active user signed in on front-end
-exports.currentUser = (req, res) => {
-  const user = {
+exports.currentUser = async (req, res) => {
+  const use = {
     first_name: "John",
     last_name: "Doe",
     headline: "Software Engineer",
@@ -153,8 +153,26 @@ exports.currentUser = (req, res) => {
     profile_banner: "https://example.com/profile-banner.jpg",
     about: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
   };
-  res.set("Access-Control-Allow-Origin", "http://127.0.0.1:5173");
-  res.status(200).json(user);
+  // console.log(req.headers.bearertoken);
+  const decoded = await getAuth()
+    .verifyIdToken(req.headers.bearertoken)
+    .then((decoded) => {
+      return decoded.uid;
+    });
+  const entry = await (
+    await db.collection("user").doc(`${decoded}`).get()
+  ).data();
+  let {
+    about,
+    first_name,
+    last_name,
+    headline,
+    location,
+    profile_banner,
+    profile_picture,
+  } = entry;
+  // console.log(user);
+  res.status(200).json({ about, first_name, last_name, headline, location, profile_banner, profile_picture });
 };
 
 // PATCH: update single user document with id
