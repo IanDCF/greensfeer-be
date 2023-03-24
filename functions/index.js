@@ -2,6 +2,7 @@ const functions = require("firebase-functions");
 const express = require("express");
 const cors = require("cors");
 const app = express();
+const { getAuth } = require("firebase-admin/auth");
 
 const {
   initializeApp,
@@ -17,9 +18,25 @@ initializeApp({
   credential: cert(serviceAccount),
 });
 
+// Middleware
+app.use(cors());
+app.use(express.json());
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Origin, X-Requested-With, Content-Type, Accept"
+  );
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET, POST, OPTIONS, PUT, PATCH, DELETE"
+  );
+  next();
+});
+
 /*--- Import Routes from router files ---*/
 // location of routing important; don't require route before app is initialized
-// const userRoute = require("./routes/userRoute");
+const userRoute = require("./routes/userRoute");
 const affiliationRoute = require("./routes/affiliationRoute");
 const commentRoute = require("./routes/commentRoute");
 const companyRoute = require("./routes/companyRoute");
@@ -35,15 +52,14 @@ const corsOptions = {
   origin: true,
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
   credentials: true,
+  optionSuccessStatus: 200,
+  allowedHeaders: "Accept",
 };
 
-// Middleware
-app.use(cors(corsOptions));
-app.use(express.json());
 // app.use(express.urlencoded({ extended: true }));
 
 /*--- Register Router Middleware ---*/
-// app.use("/api/user", userRoute);
+app.use("/api/user", userRoute);
 app.use("/api/affiliation", affiliationRoute);
 app.use("/api/comment", commentRoute);
 app.use("/api/company", companyRoute);
@@ -57,7 +73,30 @@ app.use("/api/notification", notificationRoute);
 
 // Home Route
 app.get("/", (req, res) => {
+  console.log(req.body);
+  console.log(req.headers);
+  getAuth()
+    .verifyIdToken(idToken)
+    .then((decodedToken) => {
+      console.log(decodedToken);
+    });
   return res.status(200).send("Greensfeer Backend");
+});
+
+app.post("/", (req, res) => {
+  token = req.body.token;
+  // console.log(req.body.token);
+  if (token) {
+    getAuth()
+      .verifyIdToken(token)
+      .then((decodedToken) => {
+        const uid = decodedToken.uid;
+        return console.log(uid);
+        //implement as service, user sends token with each request, check for uid match
+      });
+  }
+  console.log(req.body);
+  return res.send("success");
 });
 
 // Export API to Firebase Cloud Functions

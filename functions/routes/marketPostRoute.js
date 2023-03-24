@@ -4,6 +4,7 @@ const marketPostController = require("../controllers/marketPostController");
 router
   .route("/")
   .get(marketPostController.allMarketPosts)
+  // FIXME: only return relevant info for card view
   .post(marketPostController.newMarketPost);
 router
   .route("/:market_post_id")
