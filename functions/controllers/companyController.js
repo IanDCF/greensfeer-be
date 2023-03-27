@@ -21,7 +21,7 @@ exports.registerCompany = (req, res) => {
     location,
     sector,
     description,
-  } = req.body;
+  } = req.body.newCompany;
   const company_id = uuidv4();
   const created_at = new Date().toISOString();
   //handle creation
@@ -45,7 +45,7 @@ exports.registerCompany = (req, res) => {
       console.log(`company created: ${company_id}`);
       return res.status(200).send({
         status: 200,
-        message: `company created: ${company_id}`,
+        message: company_id,
       });
     })
     .catch((err) => {
