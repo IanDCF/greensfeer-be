@@ -13,17 +13,20 @@ const marketPostRef = db.collection("market_post");
 
 // POST: create new market post doc in ‘market_post’ collection
 exports.newMarketPost = (req, res) => {
-  const user_id = req.body.user_id;
-  const company_id = req.body.company_id;
-  const image = req.body.image;
-  const post_name = req.body.post_name;
-  const post_type = req.body.post_type;
-  const post_category = req.body.post_category;
-  const description = req.body.description;
-  const p = req.body.p || null;
-  const link = req.body.link;
-  const location = req.body;
-  const contact = req.body.contact;
+  const {
+    user_id,
+    company_id,
+    post_name,
+    post_type,
+    post_category,
+    description,
+    link,
+    location,
+    contact,
+  } = req.body.newMarketPost;
+  const p = req.body.newMarketPost.p ? p : null;
+  const image = req.body.newMarketPost.image ? image : null;
+
   const created_at = new Date().toISOString();
 
   const market_post_id = uuidv4();
@@ -48,7 +51,7 @@ exports.newMarketPost = (req, res) => {
       console.log(`New market post: ${market_post_id} successfully created`);
       return res.status(200).send({
         status: 200,
-        message: `New Market Post: ${market_post_id} has been created`,
+        message: market_post_id,
       });
     })
     .catch((err) => {
