@@ -4,6 +4,7 @@ const {
   Timestamp,
   FieldValue,
 } = require("firebase-admin/firestore");
+const { getAuth } = require("firebase-admin/auth");
 
 const db = getFirestore();
 
@@ -36,6 +37,20 @@ exports.newUserAffiliation = (req, res) => {
       console.error(error);
       return res.status(500).send({ status: 500, error: `${error}` });
     });
+};
+
+// GET:
+exports.getAffilAndContact = async (req, res) => {
+  idToken = req.headers.token;
+  const decoded = await getAuth().verifyIdToken(idToken);
+  const subset = await affiliationRef.where("user_id", "==", decoded.uid).get();
+  const company_id = subset.docs[0].data().company_id;
+  console.log(subset.docs);
+  const response = { user_id: decoded.uid, company_id };
+  return res.status(200).send({
+    status: 200,
+    message: response,
+  });
 };
 
 // GET: all affiliated companies of a single user
