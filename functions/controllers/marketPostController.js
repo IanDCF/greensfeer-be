@@ -13,6 +13,7 @@ const marketPostRef = db.collection("market_post");
 
 // POST: create new market post doc in ‘market_post’ collection
 exports.newMarketPost = (req, res) => {
+  console.log(req.body.newMarketPost);
   const {
     user_id,
     company_id,
@@ -24,7 +25,7 @@ exports.newMarketPost = (req, res) => {
     location,
     contact,
   } = req.body.newMarketPost;
-  const p = req.body.newMarketPost.p ? p : null;
+  const p = req.body.newMarketPost.p ? req.body.newMarketPost.p : null;
   const image = req.body.newMarketPost.image ? image : null;
 
   const created_at = new Date().toISOString();
