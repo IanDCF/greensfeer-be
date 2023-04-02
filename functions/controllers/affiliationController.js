@@ -14,7 +14,7 @@ exports.newUserAffiliation = (req, res) => {
   const affiliation_id = uuidv4();
   const { user_id, company_id, admin, posting } = req.body;
 
-  const created_at = new Date().toISOString();
+  const created_at = Timestamp.now()
   const affObject = {
     affiliation_id,
     user_id,
@@ -23,6 +23,7 @@ exports.newUserAffiliation = (req, res) => {
     posting,
     created_at,
   };
+  console.log(affObject)
   affiliationRef
     .doc(`${affiliation_id}`)
     .set(affObject)
