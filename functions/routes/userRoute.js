@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const userController = require("../controllers/userController");
 
-router.route("/create").post(userController.createUser);
+router.route("/create").patch(userController.createUser);
 router.route("/").get(userController.allUsers);
 router.route("/current").get(userController.currentUser);
 router

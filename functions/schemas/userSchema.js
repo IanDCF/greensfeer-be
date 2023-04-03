@@ -1,21 +1,31 @@
-const { z, string } = require("zod");
-
+const { z } = require("zod")
+const {
+  Timestamp,
+} = require("firebase-admin/firestore");
 exports.userLocationSchema = z.object({
-  city: string().trim().optional().nullable(),
-  state_province: string().trim().optional().nullable(),
-  country: string().trim().optional().nullable(),
+  city: z.string().trim().nullable(),
+  state_province: z.string().trim().nullable(),
+  country: z.string().trim().nullable(),
 });
 exports.baseUserSchema = z.object({
   first_name: z.string().trim().toLowerCase(),
   last_name: z.string().trim().toLowerCase(),
-  email: z.string().trim().toLowerCase().email(),
-  profile_picture: string().url().optional().nullable(),
-  profile_banner: z.string().url().optional().nullable(),
-  headline: string().trim().optional().nullable(),
-  linkedin: string().trim().optional().nullable(),
-  location: exports.userLocationSchema.optional().nullable(),
-  about: string().trim().optional().nullable(),
-  created_at: string().trim().optional().nullable(),
+  headline: z.string().trim().nullable(),
+  role: z.string().trim().nullable(),
 });
-exports.createUserSchema = exports.baseUserSchema;
-exports.updateUserSchema = exports.baseUserSchema;
+
+exports.createUserSchema = exports.baseUserSchema.extend({
+  email: z.string().trim().toLowerCase().email(),
+  created_at: z.any(),
+
+});
+
+
+exports.updateUserSchema = exports.baseUserSchema.extend({
+  profile_picture: z.string().url().nullable(),
+  profile_banner: z.string().url().nullable(),
+  linkedin: z.string().trim().nullable(),
+  location: exports.userLocationSchema,
+  about: z.string().trim().nullable(),
+  modified_at: z.any()
+});

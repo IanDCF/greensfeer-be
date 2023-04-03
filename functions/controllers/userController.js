@@ -20,7 +20,7 @@ const buildUserBody = (reqBody) => {
     state_province,
     country,
     about,
-    created_at,
+    role
   } = reqBody;
   const userLocation = {
     city: city || null,
@@ -37,7 +37,7 @@ const buildUserBody = (reqBody) => {
     linkedin: linkedin || null,
     location: userLocation,
     about: about || null,
-    created_at: created_at || null,
+    role: role || null
   };
 };
 // const { checkUser } = require("../services/checkUser");
@@ -47,8 +47,7 @@ const { decodeToken } = require("../services/decodeToken");
 // POST: create a database entry for user opon front end sign up
 // req from client AuthProvider signUp function, line 28
 exports.entryForSignUp = (req, res) => {
-  idToken = req.body.idToken;
-
+  const idToken = req.body.idToken;
   getAuth()
     .verifyIdToken(idToken)
     .then((decoded) => {
@@ -80,23 +79,22 @@ exports.createUser = (req, res) => {
   if (!user.success) {
     return res.status(400).send(user.error.errors);
   }
-  admin
-    .auth()
-    .createUser(user.data)
-    .then((userRecord) => {
-      console.log(userRecord);
-      const uid = userRecord.uid;
-      db.collection("user")
-        .doc(`${uid}`)
-        .set({ ...user.data, uid });
-      return uid;
+  getAuth()
+    .verifyIdToken(req.body.idToken)
+    .then((decoded) => {
+      return decoded.uid;
     })
     .then((uid) => {
+      const userRef = db.collection("user").doc(uid);
+      return userRef.update({ ...user.data, created_at: Timestamp.now() });
+    })
+    .then((newUser) => {
       return res.status(201).send({
-        message: `Successfully created new user: ${uid}`,
+        message: `Successfully created new user: ${newUser}`,
       });
     })
     .catch((error) => {
+      console.log(error)
       if (error.code == "auth/email-already-exists") {
         return res.status(400).send(error);
       }
@@ -178,9 +176,9 @@ exports.currentUser = async (req, res) => {
 // PATCH: update single user document with id
 exports.updateUser = (req, res) => {
   const userBody = buildUserBody(req.body);
-  const updateObject = updateUserSchema(userBody);
-  if (!user.success) {
-    return res.status(400).send(user.error.errors);
+  const updateObject = updateUserSchema.safeParse(userBody);
+  if (!updateObject.success) {
+    return res.status(400).send(updateObject.error.errors);
   }
   db.collection("user")
     .doc(req.params.id)
@@ -188,7 +186,7 @@ exports.updateUser = (req, res) => {
     .then((doc) => {
       if (doc.exists) {
         const userRef = db.collection("user").doc(req.params.id);
-        return userRef.update(updateObject);
+        return userRef.update({ ...updateObject.data, updated_at: Timestamp.now() });
       } else {
         return res.status(404).send({ error: "User not found" });
       }
