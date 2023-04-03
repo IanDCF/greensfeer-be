@@ -37,7 +37,6 @@ const buildUserBody = (reqBody) => {
     linkedin: linkedin || null,
     location: userLocation,
     about: about || null,
-    modified_at: Timestamp.now(),
     role: role || null
   };
 };
@@ -76,7 +75,7 @@ exports.entryForSignUp = (req, res) => {
 // POST: create new user document in 'user' collection
 exports.createUser = (req, res) => {
   const userBody = buildUserBody(req.body);
-  const user = updateUserSchema.safeParse(userBody);
+  const user = createUserSchema.safeParse(userBody);
   if (!user.success) {
     return res.status(400).send(user.error.errors);
   }
@@ -87,7 +86,7 @@ exports.createUser = (req, res) => {
     })
     .then((uid) => {
       const userRef = db.collection("user").doc(uid);
-      return userRef.update(user.data);
+      return userRef.update({ ...user.data, created_at: Timestamp.now() });
     })
     .then((newUser) => {
       return res.status(201).send({
@@ -187,7 +186,7 @@ exports.updateUser = (req, res) => {
     .then((doc) => {
       if (doc.exists) {
         const userRef = db.collection("user").doc(req.params.id);
-        return userRef.update(updateObject.data);
+        return userRef.update({ ...updateObject.data, updated_at: Timestamp.now() });
       } else {
         return res.status(404).send({ error: "User not found" });
       }
