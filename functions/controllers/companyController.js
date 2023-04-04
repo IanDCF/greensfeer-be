@@ -10,35 +10,32 @@ const companyRef = db.collection("company");
 // POST: sent from user profile create new company
 exports.registerCompany = (req, res) => {
   //get all company fields
-  const {
-    name,
-    email,
-    website,
-    logo,
-    banner,
-    headline,
-    market_role,
-    location,
-    sector,
-    description,
-  } = req.body.newCompany;
+  const { name, sector, market_role, location } = req.body.newCompany;
+  const company = req.body.newCompany;
+  const banner = company.banner ? company.banner : "";
+  const description = company.description ? company.description : "";
+  const email = company.email ? company.email : "";
+  const logo = company.logo ? company.logo : "";
+  const headline = company.headline ? company.headline : "";
+  const website = company.website ? company.website : "";
+  
   const company_id = uuidv4();
   const created_at = new Date().toISOString();
   //handle creation
   companyRef
     .doc(`${company_id}`)
     .set({
+      name,
+      sector,
+      market_role,
+      location,
       banner,
       company_id,
       created_at,
       description,
       email,
-      location,
       logo,
       headline,
-      market_role,
-      name,
-      sector,
       website,
     })
     .then(() => {
