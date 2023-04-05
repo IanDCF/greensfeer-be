@@ -62,7 +62,7 @@ exports.newMarketPost = (req, res) => {
 };
 
 // GET: query market posts with URL params (filtered search)
-exports.queryMarketPost = async (req, res) => {
+exports.filterMarketPost = async (req, res) => {
   const post_type = req.body.post_type ? req.body.post_type : "";
   const post_category = req.body.post_category ? req.body.post_category : "";
   const ep_type = req.body.ep_type ? req.body.ep_type : "";
@@ -183,6 +183,26 @@ exports.allCompanyMarketPosts = (req, res) => {
       console.error(err);
       return res.status(500).send({ error: "Server error" });
     });
+};
+
+// GET: market post whose name matches the search input
+exports.queryMarketPost = async (req, res) => {
+  const { query } = req.query;
+  try {
+    const snapshot = await db.collection("market_post").get();
+    const listings = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const name = `${data.post_name}`;
+      if (name.toLowerCase().includes(query.toLowerCase())) {
+        listings.push(data);
+      }
+    });
+    return res.status(200).send(listings);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: "Server error" });
+  }
 };
 
 // GET: a single market post

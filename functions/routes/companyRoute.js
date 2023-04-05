@@ -5,6 +5,7 @@ router
   .route("/")
   .get(companyController.allCompanies)
   .post(companyController.registerCompany);
+router.route("/search").get(companyController.searchCompany);
 router
   .route("/:id")
   .get(companyController.singleCompany)
