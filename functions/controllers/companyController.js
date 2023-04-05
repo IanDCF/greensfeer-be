@@ -18,7 +18,7 @@ exports.registerCompany = (req, res) => {
   const logo = company.logo ? company.logo : "";
   const headline = company.headline ? company.headline : "";
   const website = company.website ? company.website : "";
-  
+
   const company_id = uuidv4();
   const created_at = new Date().toISOString();
   //handle creation
@@ -67,6 +67,26 @@ exports.allCompanies = (_req, res) => {
       console.error(err);
       return res.status(500).send(`error: Server error`);
     });
+};
+
+// GET: company whose name matches the search input
+exports.searchCompany = async (req, res) => {
+  const { query } = req.query;
+  try {
+    const snapshot = await db.collection("company").get();
+    const companies = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const name = `${data.name}`;
+      if (name.toLowerCase().includes(query.toLowerCase())) {
+        companies.push(data);
+      }
+    });
+    return res.status(200).send(companies);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: "Server error" });
+  }
 };
 
 // GET: single company details
