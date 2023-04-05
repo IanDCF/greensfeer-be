@@ -12,6 +12,7 @@ router
   .patch(marketPostController.updateMarketPost)
   .delete(marketPostController.deleteMarketPost);
 router.route("/query/search").get(marketPostController.queryMarketPost);
+router.route("/filter/search").get(marketPostController.filterMarketPost);
 router
   .route("/company/:company_id")
   .get(marketPostController.allCompanyMarketPosts);
