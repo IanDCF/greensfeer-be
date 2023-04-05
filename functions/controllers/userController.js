@@ -20,7 +20,7 @@ const buildUserBody = (reqBody) => {
     state_province,
     country,
     about,
-    role
+    role,
   } = reqBody;
   const userLocation = {
     city: city || null,
@@ -37,7 +37,7 @@ const buildUserBody = (reqBody) => {
     linkedin: linkedin || null,
     location: userLocation,
     about: about || null,
-    role: role || null
+    role: role || null,
   };
 };
 // const { checkUser } = require("../services/checkUser");
@@ -94,7 +94,7 @@ exports.createUser = (req, res) => {
       });
     })
     .catch((error) => {
-      console.log(error)
+      console.log(error);
       if (error.code == "auth/email-already-exists") {
         return res.status(400).send(error);
       }
@@ -128,6 +128,26 @@ exports.allUsers = async (req, res) => {
     const users = [];
     snapshot.forEach((doc) => {
       users.push(doc.data());
+    });
+    return res.status(200).send(users);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send({ error: "Server error" });
+  }
+};
+
+// GET: users whose first_name concatenated with last_name matches the search input
+exports.searchUsers = async (req, res) => {
+  const { query } = req.query;
+  try {
+    const snapshot = await db.collection("user").get();
+    const users = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const fullName = `${data.first_name} ${data.last_name}`;
+      if (fullName.toLowerCase().includes(query.toLowerCase())) {
+        users.push(data);
+      }
     });
     return res.status(200).send(users);
   } catch (err) {
@@ -170,7 +190,17 @@ exports.currentUser = async (req, res) => {
     profile_picture,
   } = entry;
   // console.log(user);
-  res.status(200).json({ about, first_name, last_name, headline, location, profile_banner, profile_picture });
+  res
+    .status(200)
+    .json({
+      about,
+      first_name,
+      last_name,
+      headline,
+      location,
+      profile_banner,
+      profile_picture,
+    });
 };
 
 // PATCH: update single user document with id
@@ -186,7 +216,10 @@ exports.updateUser = (req, res) => {
     .then((doc) => {
       if (doc.exists) {
         const userRef = db.collection("user").doc(req.params.id);
-        return userRef.update({ ...updateObject.data, updated_at: Timestamp.now() });
+        return userRef.update({
+          ...updateObject.data,
+          updated_at: Timestamp.now(),
+        });
       } else {
         return res.status(404).send({ error: "User not found" });
       }
