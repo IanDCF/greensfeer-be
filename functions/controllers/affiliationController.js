@@ -11,27 +11,32 @@ const db = getFirestore();
 const affiliationRef = db.collection("affiliation");
 
 // POST: new affiliation doc in 'affiliation' collection
-exports.newUserAffiliation = (req, res) => {
+exports.newUserAffiliation = async (req, res) => {
   const affiliation_id = uuidv4();
-  const { user_id, company_id, admin, posting } = req.body;
-
-  const created_at = Timestamp.now()
+  console.log(req.body.newAffil);
+  const { token, company_id, admin, posting } = await req.body.newAffil;
+  const uid = await getAuth()
+    .verifyIdToken(token)
+    .then((decodedToken) => {
+      return decodedToken.uid;
+    });
+  const created_at = Timestamp.now();
   const affObject = {
     affiliation_id,
-    user_id,
+    uid,
     company_id,
     admin,
     posting,
     created_at,
   };
-  console.log(affObject)
+  console.log(affObject);
   affiliationRef
     .doc(`${affiliation_id}`)
     .set(affObject)
     .then(() => {
       return res.status(201).send({
         status: 201,
-        message: `User: ${user_id} has been affiliated with company: ${company_id}`,
+        message: `User: ${uid} has been affiliated with company: ${company_id}`,
       });
     })
     .catch((error) => {
