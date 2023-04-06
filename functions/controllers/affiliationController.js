@@ -72,7 +72,7 @@ exports.getUserAffiliations = async (req, res) => {
 
   const result = snapshot.docs.map((doc) => doc.data());
 
-  return res.status(302).send(result);
+  return res.status(200).send(result);
 };
 
 // DELETE: a single affiliation doc
