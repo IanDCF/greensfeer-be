@@ -23,7 +23,7 @@ exports.newUserAffiliation = async (req, res) => {
   const created_at = Timestamp.now();
   const affObject = {
     affiliation_id,
-    uid,
+    user_id: uid,
     company_id,
     admin,
     posting,
@@ -49,6 +49,7 @@ exports.newUserAffiliation = async (req, res) => {
 exports.getAffilAndContact = async (req, res) => {
   idToken = req.headers.token;
   const decoded = await getAuth().verifyIdToken(idToken);
+  console.log(decoded.uid)
   const subset = await affiliationRef.where("user_id", "==", decoded.uid).get();
   const company_id = subset.docs[0].data().company_id;
   console.log(subset.docs);
