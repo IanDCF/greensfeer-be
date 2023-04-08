@@ -21,6 +21,8 @@ const buildUserBody = (reqBody) => {
     country,
     about,
     role,
+    newsletter,
+    notifications
   } = reqBody;
   const userLocation = {
     city: city || null,
@@ -28,9 +30,9 @@ const buildUserBody = (reqBody) => {
     country: country || null,
   };
   return {
-    first_name: first_name,
-    last_name: last_name,
-    email: email,
+    first_name,
+    last_name,
+    email,
     profile_picture: profile_picture || null,
     profile_banner: profile_banner || null,
     headline: headline || null,
@@ -38,6 +40,8 @@ const buildUserBody = (reqBody) => {
     location: userLocation,
     about: about || null,
     role: role || null,
+    newsletter,
+    notifications
   };
 };
 // const { checkUser } = require("../services/checkUser");

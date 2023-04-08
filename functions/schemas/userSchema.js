@@ -8,10 +8,12 @@ exports.userLocationSchema = z.object({
   country: z.string().trim().nullable(),
 });
 exports.baseUserSchema = z.object({
-  first_name: z.string().trim().toLowerCase(),
-  last_name: z.string().trim().toLowerCase(),
+  first_name: z.string().trim(),
+  last_name: z.string().trim(),
   headline: z.string().trim().nullable(),
   role: z.string().trim().nullable(),
+  notifications: z.boolean(),
+  newsletter: z.boolean(),
 });
 
 exports.createUserSchema = exports.baseUserSchema.extend({
