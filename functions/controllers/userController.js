@@ -22,7 +22,7 @@ const buildUserBody = (reqBody) => {
     about,
     role,
     newsletter,
-    notifications
+    notifications,
   } = reqBody;
   const userLocation = {
     city: city || null,
@@ -41,7 +41,7 @@ const buildUserBody = (reqBody) => {
     about: about || null,
     role: role || null,
     newsletter,
-    notifications
+    notifications,
   };
 };
 // const { checkUser } = require("../services/checkUser");
@@ -79,6 +79,7 @@ exports.entryForSignUp = (req, res) => {
 // POST: create new user document in 'user' collection
 exports.createUser = (req, res) => {
   const userBody = buildUserBody(req.body);
+  const created_at = new Date().toISOString();
   const user = createUserSchema.safeParse(userBody);
   if (!user.success) {
     return res.status(400).send(user.error.errors);
@@ -90,7 +91,7 @@ exports.createUser = (req, res) => {
     })
     .then((uid) => {
       const userRef = db.collection("user").doc(uid);
-      return userRef.update({ ...user.data, created_at: Timestamp.now() });
+      return userRef.update({ ...user.data, created_at });
     })
     .then((newUser) => {
       return res.status(201).send({
@@ -192,19 +193,21 @@ exports.currentUser = async (req, res) => {
     location,
     profile_banner,
     profile_picture,
+    role,
+    created_at,
   } = entry;
   // console.log(user);
-  res
-    .status(200)
-    .json({
-      about,
-      first_name,
-      last_name,
-      headline,
-      location,
-      profile_banner,
-      profile_picture,
-    });
+  res.status(200).json({
+    about,
+    first_name,
+    last_name,
+    headline,
+    location,
+    profile_banner,
+    profile_picture,
+    role,
+    created_at,
+  });
 };
 
 // PATCH: update single user document with id
