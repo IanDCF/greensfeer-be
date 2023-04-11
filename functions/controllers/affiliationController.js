@@ -21,6 +21,7 @@ exports.newUserAffiliation = async (req, res) => {
       return decodedToken.uid;
     });
   const created_at = Timestamp.now();
+  // FIXME: new date isostring
   const affObject = {
     affiliation_id,
     user_id: uid,
