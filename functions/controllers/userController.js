@@ -23,6 +23,7 @@ const buildUserBody = (reqBody) => {
     role,
     newsletter,
     notifications,
+    location,
   } = reqBody;
   const userLocation = {
     city: city || null,
@@ -37,9 +38,9 @@ const buildUserBody = (reqBody) => {
     profile_banner: profile_banner || null,
     headline: headline || null,
     linkedin: linkedin || null,
-    location: userLocation,
-    about: about || null,
-    role: role || null,
+    location,
+    about: about || "",
+    role,
     newsletter,
     notifications,
   };
@@ -212,8 +213,9 @@ exports.currentUser = async (req, res) => {
 
 // PATCH: update single user document with id
 exports.updateUser = (req, res) => {
-  const userBody = buildUserBody(req.body);
+  const userBody = buildUserBody(req.body.update);
   const updateObject = updateUserSchema.safeParse(userBody);
+  console.log(updateObject);
   if (!updateObject.success) {
     return res.status(400).send(updateObject.error.errors);
   }
