@@ -236,16 +236,24 @@ exports.updateUser = (req, res) => {
   if (!updateObject.success) {
     return res.status(400).send(updateObject.error.errors);
   }
+
+  const updateFields = (update) => {
+    const populated = {};
+    for (const prop in update) {
+      if (update[prop]) {
+        populated.prop = update[prop];
+      }
+    }
+    populated.updated_at = new Date().toISOString();
+    return populated;
+  };
   db.collection("user")
     .doc(req.params.id)
     .get()
     .then((doc) => {
       if (doc.exists) {
         const userRef = db.collection("user").doc(req.params.id);
-        return userRef.update({
-          ...updateObject.data,
-          updated_at: Timestamp.now(),
-        });
+        return userRef.update(updateFields(updateObject.data));
       } else {
         return res.status(404).send({ error: "User not found" });
       }
