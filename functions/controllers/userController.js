@@ -213,8 +213,25 @@ exports.currentUser = async (req, res) => {
 
 // PATCH: update single user document with id
 exports.updateUser = (req, res) => {
-  const userBody = buildUserBody(req.body.update);
-  const updateObject = updateUserSchema.safeParse(userBody);
+  const {
+    first_name,
+    last_name,
+    profile_picture,
+    profile_banner,
+    headline,
+    role,
+    location,
+  } = req.body.update;
+  const updateContent = {
+    first_name,
+    last_name,
+    profile_picture,
+    profile_banner,
+    headline,
+    role,
+    location,
+  };
+  const updateObject = updateUserSchema.safeParse(updateContent);
   console.log(updateObject);
   if (!updateObject.success) {
     return res.status(400).send(updateObject.error.errors);
