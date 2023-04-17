@@ -232,7 +232,6 @@ exports.updateUser = (req, res) => {
     location,
   };
   const updateObject = updateUserSchema.safeParse(updateContent);
-  console.log(updateObject);
   if (!updateObject.success) {
     return res.status(400).send(updateObject.error.errors);
   }
@@ -240,8 +239,8 @@ exports.updateUser = (req, res) => {
   const updateFields = (update) => {
     const populated = {};
     for (const prop in update) {
-      if (update[prop]) {
-        populated.prop = update[prop];
+      if (update[`${prop}`]) {
+        populated[`${prop}`] = update[`${prop}`];
       }
     }
     populated.updated_at = new Date().toISOString();
