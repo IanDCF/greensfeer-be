@@ -221,6 +221,7 @@ exports.updateUser = (req, res) => {
     headline,
     role,
     location,
+    about,
   } = req.body.update;
   const updateContent = {
     first_name,
@@ -230,6 +231,7 @@ exports.updateUser = (req, res) => {
     headline,
     role,
     location,
+    about,
   };
   const updateObject = updateUserSchema.safeParse(updateContent);
   if (!updateObject.success) {

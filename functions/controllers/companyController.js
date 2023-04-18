@@ -112,8 +112,9 @@ exports.singleCompany = (req, res) => {
 
 // PATCH: single company details
 exports.updateCompany = (req, res) => {
-  const updateObject = req.body;
+  const updateObject = req.body.update;
   const company_id = req.params.id;
+  console.log(req.body.update);
   companyRef
     .doc(company_id)
     .get()
