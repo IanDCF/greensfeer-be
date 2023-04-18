@@ -34,7 +34,7 @@ exports.newMarketPost = async (req, res) => {
   //call service using user_id, return first name last name
   const lister_name = await firstLastName(user_id);
   //call service using company id, return company name, logo, banner
-  const { name, logo, banner } = await companyDetails(company_id);
+  const { company_name, logo, banner } = await companyDetails(company_id);
 
   const created_at = new Date().toISOString();
 
@@ -57,7 +57,7 @@ exports.newMarketPost = async (req, res) => {
       created_at,
       sector,
       lister_name,
-      company_name: name,
+      company_name: company_name,
       logo,
       banner,
     })
