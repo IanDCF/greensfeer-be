@@ -10,7 +10,7 @@ const companyRef = db.collection("company");
 // POST: sent from user profile create new company
 exports.registerCompany = (req, res) => {
   //get all company fields
-  const { name, sector, market_role, location } = req.body.newCompany;
+  const { company_name, sector, market_role, location } = req.body.newCompany;
   const company = req.body.newCompany;
   const banner = company.banner ? company.banner : "";
   const description = company.description ? company.description : "";
@@ -25,7 +25,7 @@ exports.registerCompany = (req, res) => {
   companyRef
     .doc(`${company_id}`)
     .set({
-      name,
+      company_name,
       sector,
       market_role,
       location,
@@ -69,7 +69,7 @@ exports.allCompanies = (_req, res) => {
     });
 };
 
-// GET: company whose name matches the search input
+// GET: company whose company_name matches the search input
 exports.searchCompany = async (req, res) => {
   const { query } = req.query;
   try {
@@ -77,8 +77,8 @@ exports.searchCompany = async (req, res) => {
     const companies = [];
     snapshot.forEach((doc) => {
       const data = doc.data();
-      const name = `${data.name}`;
-      if (name.toLowerCase().includes(query.toLowerCase())) {
+      const company_name = `${data.company_name}`;
+      if (company_name.toLowerCase().includes(query.toLowerCase())) {
         companies.push(data);
       }
     });
@@ -112,8 +112,9 @@ exports.singleCompany = (req, res) => {
 
 // PATCH: single company details
 exports.updateCompany = (req, res) => {
-  const updateObject = req.body;
+  const updateObject = req.body.update;
   const company_id = req.params.id;
+  console.log(req.body.update);
   companyRef
     .doc(company_id)
     .get()

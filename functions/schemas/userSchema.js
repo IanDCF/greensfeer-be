@@ -22,12 +22,12 @@ exports.createUserSchema = exports.baseUserSchema.extend({
 exports.updateUserSchema = z.object({
   first_name: z.string().trim(),
   last_name: z.string().trim(),
-  headline: z.string().trim().nullable(),
+  headline: z.string().trim().nullable().optional(),
   role: z.string().trim(),
-  profile_picture: z.string().url().nullable(),
-  profile_banner: z.string().url().nullable(),
-  linkedin: z.string().trim().nullable(),
+  profile_picture: z.string().url().nullable().optional(),
+  profile_banner: z.string().url().nullable().optional(),
+  linkedin: z.string().trim().nullable().optional(),
   location: z.string().trim(),
-  about: z.string().trim().nullable(),
+  about: z.string().trim().nullable().optional(),
   modified_at: z.any(),
 });
