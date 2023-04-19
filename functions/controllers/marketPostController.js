@@ -6,32 +6,40 @@ const {
   FieldPath,
 } = require("firebase-admin/firestore");
 const db = getFirestore();
+const { firstLastName } = require("../services/userFirstLastName");
+const { companyDetails } = require("../services/companyDetails");
 
 const marketPostRef = db.collection("market_post");
 /* Create Marketplace posts from company page*/
 /* authentication required: definitely  */
 
 // POST: create new market post doc in ‘market_post’ collection
-exports.newMarketPost = (req, res) => {
+exports.newMarketPost = async (req, res) => {
   console.log(req.body.newMarketPost);
   const {
-    user_id,
-    company_id,
     post_name,
     post_type,
     post_category,
     description,
     link,
     location,
+    user_id,
+    company_id,
     contact,
-  } = req.body.newMarketPost;
-  const p = req.body.newMarketPost.p ? req.body.newMarketPost.p : null;
-  const image = req.body.newMarketPost.image ? image : null;
+    sector,
+  } = await req.body.newMarketPost;
+  const p = (await req.body.newMarketPost.p) ? req.body.newMarketPost.p : null;
+  const image = (await req.body.newMarketPost.image) ? image : null;
+
+  //call service using user_id, return first name last name
+  const lister_name = await firstLastName(user_id);
+  //call service using company id, return company name, logo, banner
+  const { company_name, logo, banner } = await companyDetails(company_id);
 
   const created_at = new Date().toISOString();
 
   const market_post_id = uuidv4();
-  marketPostRef
+  await marketPostRef
     .doc(`${market_post_id}`)
     .set({
       market_post_id,
@@ -47,6 +55,11 @@ exports.newMarketPost = (req, res) => {
       location,
       contact,
       created_at,
+      sector,
+      lister_name,
+      company_name: company_name,
+      logo,
+      banner,
     })
     .then(() => {
       console.log(`New market post: ${market_post_id} successfully created`);
