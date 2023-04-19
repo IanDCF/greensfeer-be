@@ -213,22 +213,48 @@ exports.currentUser = async (req, res) => {
 
 // PATCH: update single user document with id
 exports.updateUser = (req, res) => {
-  const userBody = buildUserBody(req.body.update);
-  const updateObject = updateUserSchema.safeParse(userBody);
-  console.log(updateObject);
+  const {
+    first_name,
+    last_name,
+    profile_picture,
+    profile_banner,
+    headline,
+    role,
+    location,
+    about,
+  } = req.body.update;
+  const updateContent = {
+    first_name,
+    last_name,
+    profile_picture,
+    profile_banner,
+    headline,
+    role,
+    location,
+    about,
+  };
+  const updateObject = updateUserSchema.safeParse(updateContent);
   if (!updateObject.success) {
     return res.status(400).send(updateObject.error.errors);
   }
+
+  const updateFields = (update) => {
+    const populated = {};
+    for (const prop in update) {
+      if (update[`${prop}`]) {
+        populated[`${prop}`] = update[`${prop}`];
+      }
+    }
+    populated.updated_at = new Date().toISOString();
+    return populated;
+  };
   db.collection("user")
     .doc(req.params.id)
     .get()
     .then((doc) => {
       if (doc.exists) {
         const userRef = db.collection("user").doc(req.params.id);
-        return userRef.update({
-          ...updateObject.data,
-          updated_at: Timestamp.now(),
-        });
+        return userRef.update(updateFields(updateObject.data));
       } else {
         return res.status(404).send({ error: "User not found" });
       }

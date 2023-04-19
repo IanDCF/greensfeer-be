@@ -14,7 +14,9 @@ const affiliationRef = db.collection("affiliation");
 exports.newUserAffiliation = async (req, res) => {
   const affiliation_id = uuidv4();
   console.log(req.body.newAffil);
-  const { token, company_id, admin, posting, logo, company_name } = await req.body.newAffil;
+  const { token, company_id, admin, posting, company_name } = await req.body
+    .newAffil;
+  const logo = req.body.newAffil.logo ? req.body.newAffil.logo : undefined;
   const uid = await getAuth()
     .verifyIdToken(token)
     .then((decodedToken) => {
@@ -29,8 +31,8 @@ exports.newUserAffiliation = async (req, res) => {
     admin,
     posting,
     created_at,
-    logo,
-    company_name
+    logo: logo || null,
+    company_name,
   };
   console.log(affObject);
   affiliationRef
@@ -51,12 +53,16 @@ exports.newUserAffiliation = async (req, res) => {
 // GET:
 exports.getAffilAndContact = async (req, res) => {
   idToken = req.headers.token;
+  // const company_id = req.body.company_id;
   const decoded = await getAuth().verifyIdToken(idToken);
-  console.log(decoded.uid)
   const subset = await affiliationRef.where("user_id", "==", decoded.uid).get();
-  const company_id = subset.docs[0].data().company_id;
-  console.log(subset.docs);
-  const response = { user_id: decoded.uid, company_id };
+  // const subset = await affiliationRef.where("company_id", "==", company_id).get();
+  const affils =[]
+   subset.forEach((doc) => {
+    affils.push(doc.data())
+  });
+  console.log(affils);
+  const response = { affils};
   return res.status(200).send({
     status: 200,
     message: response,
