@@ -49,11 +49,14 @@ exports.newUserAffiliation = async (req, res) => {
 exports.getAffilAndContact = async (req, res) => {
   idToken = req.headers.token;
   const decoded = await getAuth().verifyIdToken(idToken);
-  console.log(decoded.uid)
   const subset = await affiliationRef.where("user_id", "==", decoded.uid).get();
-  const company_id = subset.docs[0].data().company_id;
-  console.log(subset.docs);
-  const response = { user_id: decoded.uid, company_id };
+  // const subset = await affiliationRef.where("company_id", "==", company_id).get();
+  const affils =[]
+   subset.forEach((doc) => {
+    affils.push(doc.data())
+  });
+  console.log(affils);
+  const response = { affils};
   return res.status(200).send({
     status: 200,
     message: response,
