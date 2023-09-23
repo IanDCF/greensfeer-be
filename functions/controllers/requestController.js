@@ -1,9 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-} = require("firebase-admin/firestore");
+const { getFirestore } = require("firebase-admin/firestore");
 
 const db = getFirestore();
 
@@ -83,7 +79,6 @@ exports.handleRequest = (req, res, next) => {
   //populate addressee_id from current user via token/auth
   const request_id = req.params.request_id;
   const { addressee_id, status, requester_id } = req.body;
-  console.log(status);
   const notificationObj = {
     owner_id: requester_id,
     actor_id: addressee_id,
@@ -128,7 +123,6 @@ exports.handleRequest = (req, res, next) => {
 
 // DELETE **once completed move this to a service
 exports.deleteRequest = (req, res, next) => {
-  //do I need next parameter?
   const { request_id } = req.body;
   //problem with syntax in here; how to structure to confirm doc exists & addressee matches before deleting?
   // with a query is my guess. we could use the same structure as with market posts queries

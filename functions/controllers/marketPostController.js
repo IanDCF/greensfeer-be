@@ -1,10 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-  FieldPath,
-} = require("firebase-admin/firestore");
+const { getFirestore } = require("firebase-admin/firestore");
 const db = getFirestore();
 const { firstLastName } = require("../services/userFirstLastName");
 const { companyDetails } = require("../services/companyDetails");
@@ -15,7 +10,6 @@ const marketPostRef = db.collection("market_post");
 
 // POST: create new market post doc in ‘market_post’ collection
 exports.newMarketPost = async (req, res) => {
-  console.log(req.body.newMarketPost);
   const {
     post_name,
     post_type,
@@ -168,7 +162,6 @@ exports.allMarketPosts = async (req, res) => {
     .then((snapshot) => {
       const marketPosts = [];
       snapshot.forEach((doc) => {
-        console.log(doc.data());
         marketPosts.push(doc.data());
       });
       return res.status(200).send(marketPosts);
@@ -187,7 +180,6 @@ exports.allCompanyMarketPosts = (req, res) => {
     .then((snapshot) => {
       const marketPosts = [];
       snapshot.forEach((doc) => {
-        console.log(doc.data());
         marketPosts.push(doc.data());
       });
       return res.status(200).send(marketPosts);

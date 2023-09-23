@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const { getFirestore, Timestamp } = require("firebase-admin/firestore");
+const { getFirestore } = require("firebase-admin/firestore");
 const { sendNotification } = require("../services/sendNotifiaction");
 const db = getFirestore();
 const { userInConvo } = require("../services/userInConvo");

@@ -7,6 +7,5 @@ exports.firstLastName = async (user_id) => {
   const docRef = await found.get();
   const { first_name, last_name } = await docRef.data();
   const name = { first_name, last_name };
-//   console.log(name);
   return name;
 };
