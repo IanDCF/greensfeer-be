@@ -1,5 +1,4 @@
 const { z } = require("zod");
-const { Timestamp } = require("firebase-admin/firestore");
 exports.userLocationSchema = z.object({
   city: z.string().trim().nullable(),
   state_province: z.string().trim().nullable(),

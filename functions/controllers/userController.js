@@ -1,9 +1,4 @@
-const admin = require("firebase-admin");
-const {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-} = require("firebase-admin/firestore");
+const { getFirestore } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
 const db = getFirestore();
 const { createUserSchema, updateUserSchema } = require("../schemas/userSchema");
@@ -177,7 +172,6 @@ exports.currentUser = async (req, res) => {
     profile_banner: "https://example.com/profile-banner.jpg",
     about: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
   };
-  // console.log(req.headers.bearertoken);
   const decoded = await getAuth()
     .verifyIdToken(req.headers.bearertoken)
     .then((decoded) => {
@@ -197,7 +191,6 @@ exports.currentUser = async (req, res) => {
     role,
     created_at,
   } = entry;
-  // console.log(user);
   res.status(200).json({
     about,
     first_name,

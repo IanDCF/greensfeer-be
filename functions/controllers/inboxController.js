@@ -90,11 +90,6 @@ exports.newChat = async (req, res) => {
         message: err,
       });
     });
-  //   }
-  //   return res.status(404).send({
-  //     status: 404,
-  //     message: `Require two valid users to create conversation`,
-  //   });
 };
 
 // Future services associated with inbox: PATCH: update seen & updated at when there is a GET to messages associated with conversation

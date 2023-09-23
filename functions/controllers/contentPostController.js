@@ -1,9 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-} = require("firebase-admin/firestore");
+const { getFirestore } = require("firebase-admin/firestore");
 const { getConnections } = require("../services/getConnections");
 
 const db = getFirestore();

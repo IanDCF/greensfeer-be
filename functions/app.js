@@ -73,19 +73,14 @@ app.use("/api/notification", notificationRoute);
 
 // Home Route
 app.get("/", (req, res) => {
-  console.log(req.body);
-  console.log(req.headers);
   getAuth()
     .verifyIdToken(idToken)
-    .then((decodedToken) => {
-      console.log(decodedToken);
-    });
+    .then((decodedToken) => {});
   return res.status(200).send("Greensfeer Backend");
 });
 
 app.post("/", (req, res) => {
   token = req.body.token;
-  // console.log(req.body.token);
   if (token) {
     getAuth()
       .verifyIdToken(token)
@@ -95,7 +90,6 @@ app.post("/", (req, res) => {
         //implement as service, user sends token with each request, check for uid match
       });
   }
-  console.log(req.body);
   return res.send("success");
 });
 

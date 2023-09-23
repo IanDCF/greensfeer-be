@@ -1,9 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-} = require("firebase-admin/firestore");
+const { getFirestore } = require("firebase-admin/firestore");
 const db = getFirestore();
 const companyRef = db.collection("company");
 
@@ -46,7 +42,6 @@ exports.registerCompany = (req, res) => {
       });
     })
     .catch((err) => {
-      //handle error
       console.log(err);
       return res.status(500).send(err);
     });
@@ -114,7 +109,6 @@ exports.singleCompany = (req, res) => {
 exports.updateCompany = (req, res) => {
   const updateObject = req.body.update;
   const company_id = req.params.id;
-  console.log(req.body.update);
   companyRef
     .doc(company_id)
     .get()

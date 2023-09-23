@@ -1,9 +1,5 @@
 const { v4: uuidv4 } = require("uuid");
-const {
-  getFirestore,
-  Timestamp,
-  FieldValue,
-} = require("firebase-admin/firestore");
+const { getFirestore, Timestamp } = require("firebase-admin/firestore");
 const { getAuth } = require("firebase-admin/auth");
 
 const db = getFirestore();
@@ -13,7 +9,6 @@ const affiliationRef = db.collection("affiliation");
 // POST: new affiliation doc in 'affiliation' collection
 exports.newUserAffiliation = async (req, res) => {
   const affiliation_id = uuidv4();
-  console.log(req.body.newAffil);
   const { token, company_id, admin, posting, company_name } = await req.body
     .newAffil;
   const logo = req.body.newAffil.logo ? req.body.newAffil.logo : undefined;
@@ -23,7 +18,6 @@ exports.newUserAffiliation = async (req, res) => {
       return decodedToken.uid;
     });
   const created_at = Timestamp.now();
-  // FIXME: new date isostring
   const affObject = {
     affiliation_id,
     user_id: uid,
@@ -34,7 +28,6 @@ exports.newUserAffiliation = async (req, res) => {
     logo: logo || null,
     company_name,
   };
-  console.log(affObject);
   affiliationRef
     .doc(`${affiliation_id}`)
     .set(affObject)
@@ -53,16 +46,13 @@ exports.newUserAffiliation = async (req, res) => {
 // GET:
 exports.getAffilAndContact = async (req, res) => {
   idToken = req.headers.token;
-  // const company_id = req.body.company_id;
   const decoded = await getAuth().verifyIdToken(idToken);
   const subset = await affiliationRef.where("user_id", "==", decoded.uid).get();
-  // const subset = await affiliationRef.where("company_id", "==", company_id).get();
-  const affils =[]
-   subset.forEach((doc) => {
-    affils.push(doc.data())
+  const affils = [];
+  subset.forEach((doc) => {
+    affils.push(doc.data());
   });
-  console.log(affils);
-  const response = { affils};
+  const response = { affils };
   return res.status(200).send({
     status: 200,
     message: response,
