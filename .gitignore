@@ -64,3 +64,10 @@ node_modules/
 
 # dotenv environment variables file
 .env
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
+aws-elastic-beanstalk-cli-setup/

@@ -11,10 +11,11 @@
   "engines": {
     "node": "16"
   },
-  "main": "index.js",
+  "main": "app.js",
   "dependencies": {
     "firebase-admin": "^10.0.2",
-    "firebase-functions": "^3.18.0"
+    "firebase-functions": "^3.18.0",
+    "zod": "^3.21.0"
   },
   "devDependencies": {
     "firebase-functions-test": "^0.2.0"
